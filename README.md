@@ -24,6 +24,8 @@ Todas las páginas existen también en inglés en `en/` (botón **EN/ES** del me
 
 ## Cómo actualizar contenidos
 
+👉 **Guía paso a paso para cualquier miembro del grupo: [EDITAR.md](EDITAR.md)** (recetas con ejemplos para noticias, miembros, proyectos, tesis, fotos, textos en inglés y qué hacer si algo falla).
+
 **Todo el contenido está en `datos.js`.** No hace falta tocar ningún otro archivo.
 
 1. En GitHub, abre `datos.js` y pulsa el lápiz (*Edit this file*).
@@ -53,7 +55,7 @@ Las ilustraciones de las líneas y noticias se generan en el navegador (son vect
 
 ## Espectrograma de la portada
 
-Es una grabación real convertida en imagen; no se reproduce ningún sonido. Para cambiarla (necesita Python con numpy, scipy y Pillow, y ffmpeg para MP3/FLAC):
+Es una grabación real convertida en imagen, que avanza en tiempo real y marca los cantos de la especie; no se reproduce ningún sonido. La actual es [XC838241](https://xeno-canto.org/838241) de Xeno-canto (cyclopithecus, *Chersophilus duponti*, Timoneda d'Alfés, Lleida, 2022; licencia CC BY-NC-SA 4.0, que exige citar la autoría, uso no comercial y compartir igual: la web lo cumple con el crédito al pie del espectrograma). Para cambiarla (necesita Python con numpy, scipy y Pillow, y ffmpeg para MP3/FLAC):
 
 ```
 python3 herramientas/espectrograma.py grabacion.wav --desde 12 --hasta 52 \

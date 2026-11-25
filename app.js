@@ -142,13 +142,46 @@ document.addEventListener('click', e => { const b = e.target.closest('.g-row>but
 
 /* ---------- espectrograma REAL de la portada (lo genera herramientas/espectrograma.py) ---------- */
 function realSpectrogram() {
+  // Espectrograma de una grabación real (sin sonido) que avanza como en un grabador en directo.
+  // Las detecciones se dibujan al terminar cada canto, como en el aviso de un reconocedor.
   const E = W.ESPECTROGRAMA, box = $('.spec');
   if (!E || !box) { if (box) { box.innerHTML = plate('vertebrados', 7); box.classList.add('noreal'); } $('.det-legend')?.remove(); $('.axis')?.remove(); return; }
-  const tile = `<div class="tile"><img src="${esc(asset(E.img))}" alt="">${(E.cajas || []).map(c => `<span class="det" style="left:${c.t0 / E.duracion * 100}%;width:${(c.t1 - c.t0) / E.duracion * 100}%;top:${(1 - c.f1 / E.fmax) * 100}%;height:${(c.f1 - c.f0) / E.fmax * 100}%"><em>${esc(c.etiqueta)}</em></span>`).join('')}</div>`;
-  box.innerHTML = `<div class="strip" style="animation-duration:${E.duracion}s">${tile}${tile}</div>`;
   const k = E.fmax / 1000; $('.axis').innerHTML = [1, .75, .5, .25, 0].map((f, i) => `<span>${(k * f).toLocaleString(EN ? 'en' : 'es', { maximumFractionDigits: 1 })}${i ? '' : ' ' + S.kHz}</span>`).join('');
-  $('.det-legend span').textContent = [S.spReal, E.especie, E.lugar, E.fecha, E.autor && S.spRec + ': ' + E.autor].filter(Boolean).join(' · ');
+  const lic = E.licencia ? ` (<a href="${esc(E.licencia_url || '#')}">${esc(E.licencia)}</a>)` : '';
+  const src = E.fuente ? `, <a href="${esc(E.url || '#')}">${esc(E.fuente)}</a>` : '';
+  $('.det-legend span').innerHTML = [S.spReal, `<em>${esc(E.especie)}</em>`, esc(E.lugar), esc(E.fecha), E.autor && `${S.spRec}: ${esc(E.autor)}${src}${lic}`].filter(Boolean).join(' · ');
   if (!(E.cajas || []).length) $('.det-legend i')?.remove();
+  box.innerHTML = '<canvas></canvas>';
+  const cv = $('canvas', box), cx = cv.getContext('2d'), img = new Image();
+  img.onload = () => {
+    const IW = img.naturalWidth, IH = img.naturalHeight, PXS = IW / E.duracion;
+    let head = ((E.cajas || [])[0]?.t1 + 1.2 || 4) * PXS, last = performance.now(), vis = true, Wd = 0, H = 0, sc = 1, sy = 1;
+    const size = () => { const dpr = Math.min(2, devicePixelRatio || 1); Wd = cv.clientWidth; H = cv.clientHeight; cv.width = Wd * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); sy = H / IH; sc = Wd / (PXS * Math.max(4, Math.min(12, Wd / 105))); };
+    const draw = () => {
+      const span = Wd / sc; cx.clearRect(0, 0, Wd, H);
+      // ventana [head-span, head] del bucle, partida en dos trozos si cruza el final
+      let s0 = ((head - span) % IW + IW) % IW, rest = span, dx = 0;
+      while (rest > 0) { const w = Math.min(rest, IW - s0); cx.drawImage(img, s0, 0, w, IH, dx * sc - .5, 0, w * sc + 1, H); dx += w; rest -= w; s0 = 0; }
+      cx.font = '500 12px "IBM Plex Mono",monospace'; cx.lineWidth = 1.25;
+      const cyc = Math.floor(head / IW);
+      for (let n = cyc - 1; n <= cyc; n++) for (const b of E.cajas || []) {
+        const x0 = b.t0 * PXS + n * IW, x1 = b.t1 * PXS + n * IW, age = head - x1;
+        if (age < 0 || x0 < head - span) continue;
+        const X0 = Wd - (head - x0) * sc, X1 = Wd - (head - x1) * sc, y0 = (1 - b.f1 / E.fmax) * H, y1 = (1 - b.f0 / E.fmax) * H;
+        const a = Math.min(1, age / (PXS * .35)) * (Wd < 700 ? 1 : Math.max(0, Math.min(1, (X0 / Wd - .42) / .2)));
+        if (a <= 0) continue;
+        cx.globalAlpha = a; cx.strokeStyle = '#E4D58C'; cx.strokeRect(X0, y0, X1 - X0, y1 - y0);
+        const lab = b.etiqueta, tw = cx.measureText(lab).width;
+        cx.fillStyle = 'rgba(18,23,14,.82)'; cx.fillRect(X0, y0 - 19, tw + 10, 17); cx.fillStyle = '#E4D58C'; cx.fillText(lab, X0 + 5, y0 - 6);
+      }
+      cx.globalAlpha = 1;
+    };
+    size(); draw(); addEventListener('resize', () => { size(); draw(); });
+    new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe($('.hero'));
+    const loop = t => { const dt = Math.min(64, t - last); last = t; if (vis && !document.hidden) { head += dt / 1000 * PXS; draw(); } requestAnimationFrame(loop); };
+    if (!RM) requestAnimationFrame(loop);
+  };
+  img.src = asset(E.img);
 }
 
 /* =====================================================================
