@@ -17,46 +17,48 @@ window.LINEAS = [
 ];
 
 /* MIEMBROS: email = usuario UAM sin @uam.es · lineas = ids separados por espacio
-   firma = cómo aparece en las autorías (varias formas separadas por |);
-   sirve para enlazar automáticamente publicaciones, proyectos y tesis.
-   foto: opcional, p. ej. "img/personas/traba.jpg" · coord: true = coordinación */
+   firma = cómo aparece en las autorías (varias formas separadas por |): enlaza solas sus
+           publicaciones, proyectos y tesis.
+   Opcionales: puesto · coord: true (coordinación) · orcid · despacho · tel · bio (texto breve)
+           foto (ruta en img/personas/ o URL) · uam (ficha en la web de la UAM) · rg (ResearchGate)
+           scholar (Google Scholar) · web (página personal) */
 window.MIEMBROS = [
-  {"nombre": "Diego Llusia Genique", "email": "diego.llusia", "lineas": "vertebrados", "puesto": "Coordinador del grupo", "coord": true, "firma": "Llusia"},
-  {"nombre": "Pablo Acebes Vives", "email": "pablo.acebes", "lineas": "vertebrados agraria", "puesto": "Coordinador del grupo", "coord": true, "firma": "Acebes"},
-  {"nombre": "Adrián Barrero Diego", "email": "adrian.barrero", "lineas": "vertebrados", "firma": "Barrero, A"},
-  {"nombre": "Ana Santos Torres", "email": "ana.santost", "lineas": "vertebrados", "puesto": "Investigadora predoctoral", "firma": "Santos Torres"},
-  {"nombre": "Ana Margarida Coelho dos Santos", "email": "anamc.santos", "lineas": "biogeografia pastizales", "firma": "Santos, A.M.C|A. M. C. Santos|Ana M. C. Santos|Coelho dos Santos", "puesto": "Investigadora Ramón y Cajal"},
+  {"nombre": "Diego Llusia Genique", "email": "diego.llusia", "lineas": "vertebrados", "puesto": "Coordinador del grupo", "coord": true, "firma": "Llusia", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/diego-lusia-genique"},
+  {"nombre": "Pablo Acebes Vives", "email": "pablo.acebes", "lineas": "vertebrados agraria", "puesto": "Profesor Titular de Universidad · Coordinador del grupo", "coord": true, "firma": "Acebes", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/pablo-acebes-vives", "despacho": "C-212 · Edificio de Biología", "tel": "914 978 916", "foto": "https://www.uam.es/ciencias/media/img/1606979753722/pablo-acebes-vives-512x512.jpg", "rg": "https://www.researchgate.net/profile/Pablo_Acebes", "bio": "Doctor en Ecología y Medio Ambiente por la UAM (2010) y profesor del Departamento de Ecología desde ese año. Ha realizado estancias como investigador visitante en Chile y Argentina y forma parte del grupo de especialistas en camélidos sudamericanos de la UICN. Trabaja en ecología de vertebrados terrestres, biogeografía y macroecología, y ecología agraria."},
+  {"nombre": "Adrián Barrero Diego", "email": "adrian.barrero", "lineas": "vertebrados", "firma": "Barrero, A", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/adrian-barrero-diego", "puesto": "Investigador contratado de proyecto", "despacho": "C-105 · Edificio de Biología", "tel": "914 972 575", "foto": "https://www.uam.es/ciencias/media/img/1607020828711/adrian-barrero-diego-512x512.jpg"},
+  {"nombre": "Ana Santos Torres", "email": "ana.santost", "lineas": "vertebrados", "puesto": "Investigadora predoctoral", "firma": "Santos Torres", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/ana-santos-torres"},
+  {"nombre": "Ana Margarida Coelho dos Santos", "email": "anamc.santos", "lineas": "biogeografia pastizales", "firma": "Santos, A.M.C|A. M. C. Santos|Ana M. C. Santos|Coelho dos Santos", "puesto": "Investigadora Ramón y Cajal", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/ana-margarida-coelho-dos-santos"},
   {"nombre": "André Menegotto Domingos", "email": "andre.menegotto", "lineas": "biogeografia", "firma": "Menegotto"},
-  {"nombre": "Ángel Pedro Pérez Olea", "email": "pedrop.olea", "lineas": "vertebrados agraria", "firma": "Olea, P|P. P. Olea|Pedro P. Olea|Pérez Olea"},
+  {"nombre": "Ángel Pedro Pérez Olea", "email": "pedrop.olea", "lineas": "vertebrados agraria", "firma": "Olea, P|P. P. Olea|Pedro P. Olea|Pérez Olea", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/pedro-perez-olea"},
   {"nombre": "Begoña Peco Vázquez", "email": "begonna.peco", "lineas": "pastizales", "firma": "Peco"},
   {"nombre": "Beatriz Cortés Caballero", "email": "", "lineas": "vertebrados", "puesto": "Investigadora predoctoral", "firma": "Cortés"},
-  {"nombre": "Cristina Mata Estacio", "email": "cristina.mata", "lineas": "evaluacion", "puesto": "Profesora Permanente Laboral", "orcid": "0000-0002-6206-1015", "firma": "Mata, C|Mata Estacio|Cristina Mata"},
+  {"nombre": "Cristina Mata Estacio", "email": "cristina.mata", "lineas": "evaluacion", "puesto": "Profesora Permanente Laboral", "orcid": "0000-0002-6206-1015", "firma": "Mata, C|Mata Estacio|Cristina Mata", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/cristina-mata-estacio"},
   {"nombre": "Daniel Bustillo de la Rosa", "email": "daniel.bustillodela", "lineas": "vertebrados", "firma": "Bustillo"},
-  {"nombre": "David González del Portillo", "email": "david.gonzalezd", "lineas": "vertebrados agraria", "firma": "González del Portillo|del Portillo|Gonzalez del Portillo"},
-  {"nombre": "Eduardo Tomás Mezquida", "email": "eduardo.mezquida", "lineas": "vertebrados", "firma": "Mezquida"},
-  {"nombre": "Eva María Cuesta Moreno", "email": "eva.cuesta", "lineas": "pastizales biogeografia", "firma": "Cuesta, E"},
-  {"nombre": "Francisco Martín Azcárate", "email": "fm.azcarate", "lineas": "pastizales evaluacion", "firma": "Azcárate"},
+  {"nombre": "David González del Portillo", "email": "david.gonzalezd", "lineas": "vertebrados agraria", "firma": "González del Portillo|del Portillo|Gonzalez del Portillo", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/david-gonzalez-del-portillo", "puesto": "Investigador contratado de proyecto"},
+  {"nombre": "Eduardo Tomás Mezquida", "email": "eduardo.mezquida", "lineas": "vertebrados", "firma": "Mezquida", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/eduardo-tomas-mezquida"},
+  {"nombre": "Eva María Cuesta Moreno", "email": "eva.cuesta", "lineas": "pastizales biogeografia", "firma": "Cuesta, E", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/eva-cuesta-moreno", "puesto": "Investigadora contratada de proyecto"},
+  {"nombre": "Francisco Martín Azcárate", "email": "fm.azcarate", "lineas": "pastizales evaluacion", "firma": "Azcárate", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/francisco-martin-azcarate"},
   {"nombre": "Ignacio Ramos Gutiérrez", "email": "ignacio.ramosgutierrez", "lineas": "biogeografia", "puesto": "Profesor Ayudante Doctor", "orcid": "0000-0002-8675-0114", "firma": "Ramos-Gutiérrez|I. Ramos"},
-  {"nombre": "Israel Hervás Bengochea", "email": "israel.hervas", "lineas": "evaluacion", "firma": "Hervás"},
-  {"nombre": "Javier Seoane Pinilla", "email": "javier.seoane", "lineas": "biogeografia vertebrados", "firma": "Seoane"},
-  {"nombre": "Jesús Herranz Barrera", "email": "jesus.herranz", "lineas": "evaluacion", "firma": "Herranz, J|Herranz Barrera|Jesús Herranz|J. Herranz"},
-  {"nombre": "Juan Traba Díaz", "email": "juan.traba", "lineas": "vertebrados agraria", "firma": "Traba"},
+  {"nombre": "Israel Hervás Bengochea", "email": "israel.hervas", "lineas": "evaluacion", "firma": "Hervás", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/israel-hervas-bengoechea", "puesto": "Investigador contratado de proyecto"},
+  {"nombre": "Javier Seoane Pinilla", "email": "javier.seoane", "lineas": "biogeografia vertebrados", "firma": "Seoane", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/javier-seoane-pinilla"},
+  {"nombre": "Jesús Herranz Barrera", "email": "jesus.herranz", "lineas": "evaluacion", "firma": "Herranz, J|Herranz Barrera|Jesús Herranz|J. Herranz", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/jesus-herranz-barrera"},
+  {"nombre": "Juan Traba Díaz", "email": "juan.traba", "lineas": "vertebrados agraria", "firma": "Traba", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/juan-traba-diaz"},
   {"nombre": "Juan Carlos Moreno Saiz", "email": "jcarlos.moreno", "lineas": "biogeografia", "firma": "Moreno Saiz|Moreno-Saiz|Moreno, J.C|J. C. Moreno"},
-  {"nombre": "Juan Esteban Malo Arrázola", "email": "je.malo", "lineas": "evaluacion vertebrados", "puesto": "Profesor Titular", "orcid": "0000-0002-6033-5035", "firma": "Malo"},
-  {"nombre": "Juan José Oñate Rubalcaba", "email": "juan.onate", "lineas": "agraria", "firma": "Oñate"},
-  {"nombre": "Julia Gómez Catasús", "email": "julia.gomez", "lineas": "vertebrados evaluacion", "puesto": "Profesora Ayudante Doctora", "orcid": "0000-0001-8949-5318", "firma": "Gómez-Catasús|Gómez Catasús"},
-  {"nombre": "Julia Zurdo Jordá", "email": "julia.zurdo", "lineas": "vertebrados", "firma": "Zurdo"},
+  {"nombre": "Juan Esteban Malo Arrázola", "email": "je.malo", "lineas": "evaluacion vertebrados", "puesto": "Profesor Titular", "orcid": "0000-0002-6033-5035", "firma": "Malo", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/juan-esteban-malo-arrazola"},
+  {"nombre": "Juan José Oñate Rubalcaba", "email": "juan.onate", "lineas": "agraria", "firma": "Oñate", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/juan-jose-onate-rubalcaba"},
+  {"nombre": "Julia Gómez Catasús", "email": "julia.gomez", "lineas": "vertebrados evaluacion", "puesto": "Profesora Ayudante Doctora", "orcid": "0000-0001-8949-5318", "firma": "Gómez-Catasús|Gómez Catasús", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/julia-gomez-catasus"},
+  {"nombre": "Julia Zurdo Jordá", "email": "julia.zurdo", "lineas": "vertebrados", "firma": "Zurdo", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/julia-zurdo-jorda", "puesto": "Investigadora contratada de proyecto"},
   {"nombre": "Laura dos Santos Pinto Vázquez", "email": "laura.dossantospinto", "lineas": "", "firma": "dos Santos Pinto"},
   {"nombre": "Lourenço Falcão Rodrigues", "email": "lourenco.falcao", "lineas": "evaluacion", "firma": "Falcão"},
-  {"nombre": "Manuel Borja Morales Prieto", "email": "manuel.morales", "lineas": "vertebrados agraria", "puesto": "Catedrático · Director del CIBC-UAM", "orcid": "0000-0001-8534-7895", "firma": "Morales, M|M. B. Morales|Manuel B. Morales"},
+  {"nombre": "Manuel Borja Morales Prieto", "email": "manuel.morales", "lineas": "vertebrados agraria", "puesto": "Catedrático · Director del CIBC-UAM", "orcid": "0000-0001-8534-7895", "firma": "Morales, M|M. B. Morales|Manuel B. Morales", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/manuel-borja-morales-prieto"},
   {"nombre": "Margarita Reverter Cid", "email": "margarita.reverter", "lineas": "vertebrados", "firma": "Reverter"},
-  {"nombre": "María Fátima Franco Múgica", "email": "fatima.franco", "lineas": "biogeografia", "puesto": "Profesora Contratada Doctora", "orcid": "0000-0002-9372-8863", "firma": "Franco-Múgica|Franco Múgica|F. Franco"},
-  {"nombre": "María Isabel Castro Parga", "email": "isabel.castro", "lineas": "", "firma": "Castro Parga"},
+  {"nombre": "María Fátima Franco Múgica", "email": "fatima.franco", "lineas": "biogeografia", "puesto": "Profesora Contratada Doctora", "orcid": "0000-0002-9372-8863", "firma": "Franco-Múgica|Franco Múgica|F. Franco", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/fatima-franco-mugica"},
+  {"nombre": "María Isabel Castro Parga", "email": "isabel.castro", "lineas": "", "firma": "Castro Parga", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/isabel-castro-parga"},
   {"nombre": "Pedro Sáez Gómez", "email": "pedro.saez", "lineas": "vertebrados", "firma": "Sáez-Gómez|Sáez Gómez"},
   {"nombre": "Rafael Molina Venegas", "email": "rafael.molina", "lineas": "biogeografia", "firma": "Molina-Venegas|Molina Venegas"},
   {"nombre": "Rodrigo García Vegas", "email": "rodrigo.garciav", "lineas": "", "firma": "García Vegas"},
   {"nombre": "Sonia Llorente Culebras", "email": "", "lineas": "biogeografia", "firma": "Llorente-Culebras"},
-  {"nombre": "William Douglas Carvalho Sá", "email": "william.mustin", "lineas": "biogeografia vertebrados", "puesto": "Investigador Ramón y Cajal", "orcid": "0000-0003-2518-9148", "firma": "Carvalho, W|W. D. Carvalho|William D. Carvalho|W. D. M. Carvalho"}
+  {"nombre": "William Douglas Carvalho Sá", "email": "william.mustin", "lineas": "biogeografia vertebrados", "puesto": "Investigador Ramón y Cajal", "orcid": "0000-0003-2518-9148", "firma": "Carvalho, W|W. D. Carvalho|William D. Carvalho|W. D. M. Carvalho", "uam": "https://www.uam.es/ciencias/facultad/dpto-ecologia/william-douglas-carvalho-sa"}
 ];
 
 /* PROYECTOS: tipo = life | nacional | internacional | contrato
@@ -111,7 +113,6 @@ window.PROYECTOS = [
   {"t": "Propuesta de programa de compensación de impactos sobre la avifauna esteparia para los proyectos fotovoltaicos de la comunidad de Madrid", "ref": "066207", "fin_": "Dirección General del Biodiversidad y Recursos Naturales (Consejería de Medio Ambiente, Vivienda y Agricultura).", "ini": 2023, "fin": 2023, "ip": "Manuel B. Morales Prieto", "linea": "evaluacion", "tipo": "contrato", "eur": "18.000"},
   {"t": "Elaboración de la lista patrón de la flora vascular de España", "ref": "", "fin_": "Tecnologías y Servicios Agrarios SA (TRAGSATEC).", "ini": 2023, "fin": 2023, "ip": "Juan Carlos Moreno Saiz", "linea": "biogeografia", "tipo": "contrato", "eur": "12.000"},
   {"t": "Estudio ecosistémico en el área de emplazamiento de la Planta Solar Fotovoltaica de Navarredonda (Colmenar de Oreja)", "ref": "", "fin_": "EDP RENOVABLES ESPAÑA, S.L.U.", "ini": 2023, "fin": 2024, "ip": "Cristina Mata Estacio", "linea": "evaluacion", "tipo": "contrato", "eur": "45.080,00 €"},
-  {"t": "Desafíos y oportunidades para la provisión de funciones y servicios de los ecosistemas en paisajes agrícolas y renaturalizados.", "ref": "PID2022-142096OB-100", "fin_": "Ministerio de Ciencia, Innovación y Universidades (Generación de Conocimiento 2022).", "ini": 2023, "fin": 2027, "ip": "Pablo Acebes y Pedro Pérez Olea", "linea": "agraria", "tipo": "nacional", "eur": "237.500€"},
   {"t": "Consequências da elevação do nível do mar na distribuição das fitofisionomias e vertebrados que ocorrem no estuário do Rio Amazonas", "ref": "444953/2024-8", "fin_": "Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq, Brasil).", "ini": 2025, "fin": 2027, "ip": "Renato R. Hilário", "linea": "vertebrados", "tipo": "internacional", "eur": "80.000,00€"},
   {"t": "Métodos Integrados de Avaliação do Impacto das Queimadas na Qualidade do Ar, Biota Animal e Modelos in vitro no Pantanal e Amazônia", "ref": "444435/2024-7", "fin_": "Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq, Brasil).", "ini": 2025, "fin": 2027, "ip": "Alexeia Barufatti", "linea": "vertebrados", "tipo": "internacional", "eur": "100.000,00€"},
   {"t": "Contrato menor para la realización del proyecto: Mejora de la lucha contra el riesgo aviar en los alrededores de bases aéreas y aeródromos militares", "ref": "FUAM convenio 0479/2024", "fin_": "Mando de Apoyo Logístico del Ejército del Aire, Ministerio de Defensa.", "ini": 2024, "fin": 2024, "ip": "Juan Carlos Moreno Saiz", "linea": "evaluacion", "tipo": "contrato", "eur": "14.870,00"},

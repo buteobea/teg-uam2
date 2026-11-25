@@ -294,7 +294,7 @@ equipo() {
   $('#oq').addEventListener('input', e => { oQ = norm(e.target.value); draw(false); people(); });
   function people() { const list = PTS.filter(p => (!oLine || p.ls.includes(oLine)) && (!oQ || norm(p.m.nombre).includes(oQ))).sort((a, b) => (b.m.coord ? 1 : 0) - (a.m.coord ? 1 : 0) || a.m.nombre.localeCompare(b.m.nombre, 'es'));
     $('#ocount').textContent = list.length + (list.length === 1 ? ' persona' : ' personas');
-    $('#people').innerHTML = list.map(p => `<a class="person${p.m.coord ? ' c' : ''}" href="miembro.html?id=${p.id}"><span class="av">${p.m.foto ? `<img src="${esc(p.m.foto)}" alt="">` : esc(initials(p.m.nombre))}</span><div><b>${esc(p.m.nombre)}</b><span>${esc(p.m.puesto || p.ls.map(id => lineById(id)?.corto).join(' · ') || 'TEG-UAM')}</span></div></a>`).join('') || '<p class="empty">Nadie coincide con la búsqueda.</p>'; }
+    $('#people').innerHTML = list.map(p => `<a class="person${p.m.coord ? ' c' : ''}" href="miembro.html?id=${p.id}"><span class="av">${p.m.foto ? `<img src="${esc(p.m.foto)}" alt="" onerror="this.replaceWith('${esc(initials(p.m.nombre))}')">` : esc(initials(p.m.nombre))}</span><div><b>${esc(p.m.nombre)}</b><span>${esc(p.m.puesto || p.ls.map(id => lineById(id)?.corto).join(' · ') || 'TEG-UAM')}</span></div></a>`).join('') || '<p class="empty">Nadie coincide con la búsqueda.</p>'; }
   people();
 },
 
@@ -306,17 +306,23 @@ miembro() {
   pageArt(p.ls[0] || 'biogeografia', p.i + 2);
   $('#mname').textContent = m.nombre; $('#crumbname').textContent = m.nombre.split(' ').slice(0, 2).join(' ');
   $('#mrole').textContent = m.puesto || 'Miembro del TEG-UAM';
-  $('#mav').innerHTML = m.foto ? `<img src="${esc(m.foto)}" alt="">` : esc(initials(m.nombre));
+  $('#mav').innerHTML = m.foto ? `<img src="${esc(m.foto)}" alt="Fotografía de ${esc(m.nombre)}" onerror="this.replaceWith('${esc(initials(m.nombre))}')">` : esc(initials(m.nombre));
   const pubs = B.map((b, i) => ({ b, i })).filter(x => signs(m, x.b.au)).sort((a, b) => b.b.a - a.b.a);
   const pr = P.filter(x => signs(m, x.ip)).sort((a, b) => b.fin - a.fin);
-  const th = T.filter(t => signs(m, t.dir) || m.nombre.includes(t.autor));
+  const own = T.filter(t => norm(m.nombre).includes(norm(t.autor)) || norm(t.autor).includes(norm(m.nombre)));
+  const th = T.filter(t => signs(m, t.dir) && !own.includes(t)).sort((a, b) => (a.estado === b.estado ? 0 : a.estado === 'curso' ? -1 : 1));
   kpis('#kp', [[pubs.length, 'publicaciones en esta web'], [pr.length, 'proyectos como IP o participante'], [th.length, 'tesis dirigidas o tutorizadas']]);
+  if (m.bio) $('#mrole').insertAdjacentHTML('afterend', `<p class="lede" style="font-size:16.5px;max-width:70ch;margin-top:14px;color:#C9CFBD">${esc(m.bio)}</p>`);
   const em = email(m);
+  const links = [[m.orcid && 'https://orcid.org/' + m.orcid, 'ORCID'], [m.uam, 'Ficha en la UAM'], [m.scholar, 'Google Scholar'], [m.rg, 'ResearchGate'], [m.web, 'Web personal']].filter(x => x[0]);
+  const thItem = t => `<li>${esc(t.autor)}: ${esc(t.t)}<small>${t.estado === 'leida' ? 'Leída' : 'En curso · prevista'} ${esc(t.fecha || 's. f.')} · ${esc(t.prog)} · Dir.: ${esc(t.dir)}</small></li>`;
   $('#mbody').innerHTML = `<div class="cols2">
     <div><h3>Líneas</h3><div class="tags">${p.ls.map(id => `<a class="tag" href="lineas.html#${id}">${esc(lineById(id)?.nombre)}</a>`).join('') || '<span class="mute">Pendiente de asignar</span>'}</div>
-      <h3 style="margin-top:24px">Contacto</h3><p>${em ? `<a href="mailto:${esc(em)}">${esc(em)}</a><br>` : ''}${m.orcid ? `ORCID: <a href="https://orcid.org/${esc(m.orcid)}">${esc(m.orcid)}</a>` : ''}${!em && !m.orcid ? '<span class="mute">Sin datos de contacto públicos.</span>' : ''}</p>
+      <h3 style="margin-top:24px">Contacto</h3><dl class="ficha">${em ? `<dt>Correo</dt><dd><a href="mailto:${esc(em)}">${esc(em)}</a></dd>` : ''}${m.despacho ? `<dt>Despacho</dt><dd>${esc(m.despacho)}</dd>` : ''}${m.tel ? `<dt>Teléfono</dt><dd>${esc(m.tel)}</dd>` : ''}${m.orcid ? `<dt>ORCID</dt><dd><a href="https://orcid.org/${esc(m.orcid)}">${esc(m.orcid)}</a></dd>` : ''}</dl>${!em && !m.despacho ? '<p class="mute">Sin datos de contacto públicos.</p>' : ''}
+      ${links.length ? `<div class="tags">${links.map(l => `<a class="tag" href="${esc(l[0])}">${l[1]} ↗</a>`).join('')}</div>` : ''}
+      ${own.length ? `<h3 style="margin-top:24px">Su tesis doctoral</h3><ul class="plist">${own.map(thItem).join('')}</ul>` : ''}
       ${pr.length ? `<h3 style="margin-top:24px">Proyectos</h3><ul class="plist">${pr.map(x => `<li>${esc(x.t)}<small>${x.ini}–${x.fin} · ${esc(x.fin_)}${active(x) ? ' · en curso' : ''}</small></li>`).join('')}</ul>` : ''}
-      ${th.length ? `<h3 style="margin-top:24px">Tesis</h3><ul class="plist">${th.map(t => `<li>${esc(t.autor)}: ${esc(t.t)}<small>${t.estado === 'leida' ? 'Leída' : 'En curso'} ${esc(t.fecha)} · ${esc(t.prog)}</small></li>`).join('')}</ul>` : ''}
+      ${th.length ? `<h3 style="margin-top:24px">Tesis dirigidas o tutorizadas (${th.length})</h3><ul class="plist">${th.map(thItem).join('')}</ul>` : ''}
     </div>
     <div><h3>Publicaciones (${pubs.length})</h3><div id="mpubs">${pubs.length ? pubs.slice(0, 12).map(x => pubHTML(x.b, x.i)).join('') : '<p class="mute">Aún no hay publicaciones suyas en la web.</p>'}</div>${pubs.length > 12 ? `<button class="btn ghost" id="mmore" style="color:var(--text);margin-top:16px">Ver las ${pubs.length}</button>` : ''}
       <p class="note" style="margin-top:14px">Se enlazan automáticamente buscando su firma en las autorías de las publicaciones recogidas en la web.</p></div></div>`;
