@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEG-UAM · Ecología Terrestre</title>
+<meta name="description" content="Grupo de Investigación de Ecología y Conservación de Ecosistemas Terrestres (TEG-UAM). Departamento de Ecología, Universidad Autónoma de Madrid.">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* VOICE: un grupo de campo que escucha el paisaje; preciso, sobrio, con pulso.
+   IDEA: la web como una grabación de campo analizada: espectrograma con detecciones, transecto, ordenación, diagrama de Gantt.
+   PICTURE: espectrograma vivo que se desplaza con cantos sintéticos y cajas de detección de especies esteparias.
+   COLOUR/TYPE: tinta de páramo nocturno, verde TEG (#92AA32) y paja; Archivo expandida para títulos, Plex Mono solo en ejes y etiquetas de figura.
+   LAYOUT: bandas a todo ancho; cada sección es una figura con su pie; contenido a 1240px. */
+:root{color-scheme:light dark;
+ --ink:#12170E;--ink2:#1C2416;--leaf:#92AA32;--olive:#4F6421;--straw:#E4D58C;--paper:light-dark(#FAFAF5,#10140C);
+ --text:light-dark(#151B10,#E9ECE1);--mute:light-dark(#5C6553,#A2AA96);--rule:light-dark(#DCDFD0,#2B3324);
+ --tint:light-dark(#EEF1E2,#1A2114);--card:light-dark(#fff,#161C11);--acc:light-dark(#4F6421,#B5CC55);--accInk:light-dark(#fff,#12170E)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--paper);color:var(--text);font:16.5px/1.6 Archivo,system-ui,sans-serif;font-variation-settings:"wdth" 100;overflow-x:clip}
+a{color:var(--acc)}
+img{display:block;max-width:100%}
+h1,h2,h3{margin:0;text-wrap:balance;font-variation-settings:"wdth" 118;letter-spacing:-.015em}
+h2{font-size:clamp(30px,4vw,48px);line-height:1.04;font-weight:750}
+h3{font-size:19px;line-height:1.25;font-weight:650;font-variation-settings:"wdth" 108}
+p{margin:0 0 1em;max-width:66ch}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;letter-spacing:0}
+.wrap{max-width:1240px;margin:0 auto}
+.band{padding:clamp(56px,8vw,112px) max(5vw,18px)}
+.tint{background:var(--tint)}
+.dark{background:var(--ink);color:#E9ECE1}.dark a{color:var(--leaf)}
+.mute{color:var(--mute)}
+.lede{font-size:clamp(18px,1.6vw,21px);line-height:1.5}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,64px);align-items:end;margin-bottom:clamp(28px,4vw,48px)}
+.sec-head p{margin:0}
+.cap{font-size:13.5px;color:var(--mute);margin-top:12px;max-width:none}
+@media(max-width:760px){.sec-head{grid-template-columns:1fr}}
+
+/* ---------- navegación-transecto ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;padding:0 max(5vw,18px);transition:background .3s,color .3s,box-shadow .3s;color:#E9ECE1}
+.nav.solid{background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(10px);color:var(--text);box-shadow:0 1px 0 var(--rule)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:66px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.brand .lg{width:46px;height:34px;background:#fff;border-radius:8px;display:grid;place-items:center;padding:3px}
+.brand img{max-height:28px;width:auto}
+.brand b{font-size:15px;font-variation-settings:"wdth" 120;letter-spacing:.01em}
+.brand small{display:block;font-size:11.5px;opacity:.75;font-weight:400}
+.nav ul{display:flex;gap:2px;list-style:none;margin:0;padding:0}
+.nav ul a{display:block;color:inherit;text-decoration:none;font-size:14.5px;font-weight:550;padding:10px 11px;border-radius:8px;opacity:.82}
+.nav ul a:hover,.nav ul a.on{opacity:1}
+.nav ul a.on{color:var(--leaf)}
+.nav.solid ul a.on{color:var(--acc)}
+.transect{position:absolute;left:0;right:0;bottom:0;height:2px;background:transparent}
+.transect i{position:absolute;inset:0 auto 0 0;width:0;background:var(--leaf)}
+#mbtn{display:none;background:none;border:1px solid currentColor;color:inherit;border-radius:999px;min-height:40px;padding:0 16px;font:inherit;font-weight:600;cursor:pointer}
+@media(max-width:1020px){#mbtn{display:block}.nav ul{display:none;position:absolute;top:66px;left:0;right:0;flex-direction:column;background:var(--paper);color:var(--text);padding:10px max(5vw,18px) 18px;box-shadow:0 8px 20px rgba(0,0,0,.12)}.nav ul.open{display:flex}.nav ul a{font-size:17px;padding:12px}.brand small{display:none}}
+
+/* ---------- héroe: espectrograma ---------- */
+.hero{position:relative;background:var(--ink);color:#EEF1E5;min-height:min(100svh,920px);display:grid;grid-template-rows:1fr auto;overflow:hidden}
+.spec{position:absolute;inset:0}
+.spec canvas{position:absolute;inset:0;width:100%;height:100%}
+#sg{image-rendering:auto;filter:saturate(1.05)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,23,14,.94) 0%,rgba(18,23,14,.72) 42%,rgba(18,23,14,0) 72%),linear-gradient(0deg,rgba(18,23,14,.9),rgba(18,23,14,0) 35%);pointer-events:none}
+.axis{position:absolute;z-index:2;color:rgba(233,236,225,.55)}
+.axis.y{right:max(5vw,18px);top:90px;bottom:150px;display:flex;flex-direction:column;justify-content:space-between;text-align:right}
+.hero-in{position:relative;z-index:3;align-self:end;padding:120px max(5vw,18px) 0}
+.hero h1{font-size:clamp(40px,7.2vw,96px);line-height:.95;font-weight:800;font-variation-settings:"wdth" 122;max-width:12ch;letter-spacing:-.025em}
+.hero h1 em{font-style:normal;color:var(--leaf)}
+.hero .lede{max-width:52ch;margin:24px 0 0;color:#D6DBCB}
+.hero-foot{position:relative;z-index:3;padding:28px max(5vw,18px) 34px}
+.hero-foot .wrap{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.stats{display:flex;gap:clamp(20px,4vw,52px);flex-wrap:wrap}
+.stats div b{display:block;font-size:clamp(28px,3.4vw,42px);line-height:1;font-weight:750;font-variation-settings:"wdth" 120;color:#fff}
+.stats div span{font-size:13px;color:#BFC6B2}
+.det-legend{display:flex;align-items:center;gap:10px;color:#BFC6B2}
+.det-legend i{width:18px;height:12px;border:1.5px solid var(--straw);border-radius:2px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;font-weight:650;font-size:15px;text-decoration:none;border:1.5px solid var(--leaf);background:var(--leaf);color:#12170E;cursor:pointer;font-family:inherit;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:inherit;border-color:currentColor}
+:focus-visible{outline:3px solid var(--leaf);outline-offset:3px}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- grupo ---------- */
+.manifest{font-size:clamp(24px,3vw,38px);line-height:1.22;font-weight:500;font-variation-settings:"wdth" 104;letter-spacing:-.01em;max-width:30ch;margin:0}
+.manifest b{font-weight:700;color:var(--acc)}
+.aims{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:clamp(36px,5vw,64px);border-top:1.5px solid var(--text)}
+.aims div{padding:20px 24px 4px 0;border-right:1px solid var(--rule)}
+.aims div+div{padding-left:24px}.aims div:last-child{border-right:0}
+.aims .mono{color:var(--acc)}
+@media(max-width:760px){.aims{grid-template-columns:1fr}.aims div,.aims div+div{padding:18px 0;border-right:0;border-bottom:1px solid var(--rule)}}
+
+/* ---------- líneas: acordeón con revelado ---------- */
+.lines{border-top:1.5px solid var(--text)}
+.ln{border-bottom:1px solid var(--rule)}
+.ln button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:18px;padding:22px 0;cursor:pointer}
+.ln button:focus-visible{outline:3px solid var(--leaf)}
+.ln .glyph{width:56px;height:36px}
+.ln .glyph path{fill:none;stroke:var(--acc);stroke-width:1.6}
+.ln h3{font-size:clamp(20px,2.4vw,30px);font-weight:700;font-variation-settings:"wdth" 115}
+.ln .n{color:var(--mute)}
+.ln .plus{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--rule);display:grid;place-items:center;transition:transform .35s,background .3s}
+.ln[open] .plus{transform:rotate(45deg);background:var(--leaf);border-color:var(--leaf)}
+.ln .body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,.7,.2,1)}
+.ln[open] .body{grid-template-rows:1fr}
+.ln .body>div{overflow:hidden}
+.ln .inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(20px,4vw,48px);padding:4px 0 30px 74px}
+.ln .inner img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:4px;clip-path:inset(0 100% 0 0);transition:clip-path .9s cubic-bezier(.2,.7,.2,1) .1s}
+.ln[open] .inner img{clip-path:inset(0 0 0 0)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px}
+.tag{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--tint);color:var(--acc);font-weight:600;border:1px solid var(--rule)}
+.who{font-size:14px;color:var(--mute)}
+@media(max-width:760px){.ln .inner{grid-template-columns:1fr;padding-left:0}.ln button{grid-template-columns:44px minmax(0,1fr) auto}.ln .glyph{width:44px}}
+
+/* ---------- equipo: ordenación ---------- */
+.ord{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(20px,3vw,40px);align-items:start}
+.fig{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:6px}
+#ordfig{aspect-ratio:1.15/1;width:100%}
+@media(max-width:600px){#ordfig{aspect-ratio:1/1.05}}
+#ordfig svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#EEF1E5;padding:8px 12px;border-radius:6px;font-size:13.5px;line-height:1.35;transform:translate(-50%,calc(-100% - 12px));white-space:nowrap;opacity:0;transition:opacity .15s;z-index:3}
+.tip small{display:block;color:#AEB6A2}
+.side h3{margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:0 15px;border-radius:999px;border:1px solid var(--rule);background:var(--card);color:var(--text);font:inherit;font-size:14px;cursor:pointer;transition:background .2s}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
+.search{width:100%;font:inherit;font-size:16px;min-height:46px;padding:0 16px;border:1px solid var(--rule);border-radius:999px;background:var(--card);color:var(--text)}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0;margin-top:28px;border-top:1px solid var(--rule)}
+.person{padding:14px 14px 14px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:12px minmax(0,1fr);gap:12px;transition:background .25s}
+.person.hl{background:var(--tint)}
+.person .dot{width:10px;height:10px;border-radius:50%;background:var(--leaf);margin-top:7px}
+.person.c .dot{background:var(--olive);box-shadow:0 0 0 3px var(--leaf)}
+.person b{display:block;font-weight:650;line-height:1.3}
+.person span{display:block;font-size:13.5px;color:var(--mute)}
+.person a{font-size:13.5px;overflow-wrap:anywhere}
+.count{font-size:14px;color:var(--mute);margin:14px 0 0}
+@media(max-width:900px){.ord{grid-template-columns:1fr}}
+
+/* ---------- proyectos: Gantt ---------- */
+.gantt{border-top:1.5px solid var(--text)}
+.g-axis,.g-row>button{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:20px;align-items:center}
+.g-axis{padding:10px 0;color:var(--mute);border-bottom:1px solid var(--rule);position:sticky;top:66px;background:var(--paper);z-index:4}
+.g-years{position:relative;height:18px}
+.g-years span{position:absolute;transform:translateX(-50%)}
+.g-row{border-bottom:1px solid var(--rule)}
+.g-row>button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:20px;align-items:center;padding:11px 0;cursor:pointer}
+.g-row>button:hover{background:var(--tint)}
+.g-row>button:focus-visible{outline:2px solid var(--leaf)}
+.g-t{font-size:15px;line-height:1.3;font-weight:550}
+.g-t small{display:block;font-weight:400;color:var(--mute);font-size:12.5px;margin-top:2px}
+.track{position:relative;height:22px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/19 - 1px),var(--rule) calc(100%/19 - 1px) calc(100%/19))}
+.bar{position:absolute;top:4px;bottom:4px;border-radius:3px;transform-origin:left;transform:scaleX(0);transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.gantt.in .bar{transform:scaleX(1)}
+.bar.life{background:var(--olive)}.bar.nacional{background:var(--leaf)}.bar.internacional{background:#C2A73A}.bar.contrato{background:repeating-linear-gradient(135deg,var(--leaf) 0 5px,#B9CB6F 5px 10px)}
+.today{position:absolute;top:-4px;bottom:-4px;width:0;border-left:1.5px dashed #C25A2E}
+.g-more{display:none;padding:0 0 16px;font-size:14.5px;color:var(--mute)}
+.g-row.open .g-more{display:block}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:13.5px;color:var(--mute)}
+.legend i{display:inline-block;width:22px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+@media(max-width:700px){.g-axis,.g-row>button{grid-template-columns:1fr;gap:6px}.g-axis .lab{display:none}}
+
+/* ---------- publicaciones ---------- */
+.pub-top{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,56px);align-items:start}
+.meter{margin-bottom:18px}
+.meter .row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
+.meter .row b{font-variation-settings:"wdth" 115}
+.meter .tr{height:10px;background:var(--tint);border-radius:999px;overflow:hidden;border:1px solid var(--rule)}
+.meter .tr i{display:block;height:100%;width:0;background:var(--leaf);transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+.big{font-size:clamp(64px,9vw,120px);line-height:.9;font-weight:800;font-variation-settings:"wdth" 125;color:var(--acc);letter-spacing:-.03em}
+.ptools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ptools .search{flex:1 1 240px}
+.ptools select{font:inherit;font-size:16px;min-height:46px;padding:0 14px;border:1px solid var(--rule);border-radius:999px;background:var(--card);color:var(--text)}
+.pub{padding:16px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px}
+.pub .y{color:var(--mute);padding-top:2px}
+.pub a.t{font-weight:600;color:var(--text);text-decoration:none;display:block;line-height:1.35}
+.pub a.t:hover{color:var(--acc);text-decoration:underline}
+.pub .a{font-size:14px;color:var(--mute);margin-top:4px}
+.pub .a em{color:var(--text)}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:4px;margin-left:6px;vertical-align:1px}
+.badge.q{background:var(--ink);color:var(--straw)}.badge.oa{background:var(--leaf);color:#12170E}.badge.k{border:1px solid var(--rule);color:var(--mute)}
+.more{margin-top:18px}
+@media(max-width:860px){.pub-top{grid-template-columns:1fr}}
+
+/* ---------- tesis: calendario de defensas ---------- */
+.tcal{position:relative;height:190px;margin:10px 0 8px}
+.tcal .base{position:absolute;left:0;right:0;bottom:30px;border-top:1.5px solid currentColor;opacity:.5}
+.tcal .yr{position:absolute;bottom:4px;transform:translateX(-50%);color:#AEB6A2}
+.tcal .dot{position:absolute;width:16px;height:16px;border-radius:50%;transform:translate(-50%,0) scale(0);transition:transform .6s cubic-bezier(.3,1.6,.5,1);border:0;padding:0;cursor:pointer;background:var(--leaf)}
+.tcal .dot.leida{background:var(--straw)}
+.tcal.in .dot{transform:translate(-50%,0) scale(1)}
+.tcal .dot:hover,.tcal .dot:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.tinfo{min-height:48px;color:#D6DBCB}
+.tlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin-top:20px}
+.tlist div{padding:12px 0;border-top:1px solid rgba(233,236,225,.14)}
+.tdet{margin-top:22px}.tdet summary{list-style:none;color:#E9ECE1;width:max-content}.tdet summary::-webkit-details-marker{display:none}.tdet[open] summary{background:var(--leaf);color:#12170E;border-color:var(--leaf)}
+.tlist b{display:block;color:#fff;font-weight:600}
+.tlist span{font-size:13.5px;color:#AEB6A2}
+@media(max-width:760px){.tlist{grid-template-columns:1fr}}
+
+/* ---------- novedades ---------- */
+.strip{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px}
+.strip>article{flex:0 0 clamp(260px,30vw,340px);scroll-snap-align:start;background:var(--card);border:1px solid var(--rule);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.strip img{aspect-ratio:3/2;object-fit:cover;width:100%;transition:transform .6s}
+.strip article:hover img{transform:scale(1.04)}
+.strip .in2{padding:16px 18px 20px}
+.strip .mono{color:var(--acc)}
+.strip p{font-size:14.5px;color:var(--mute);margin:6px 0 0}
+.snav{display:flex;gap:8px}
+.snav button{width:46px;height:46px;border-radius:50%;border:1px solid var(--rule);background:var(--card);color:var(--text);font-size:18px;cursor:pointer}
+
+/* ---------- formación / contacto ---------- */
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border-top:1.5px solid var(--text)}
+.cols3>div{padding:20px 24px 20px 0;border-bottom:1px solid var(--rule)}
+footer{background:var(--ink);color:#C9CFBD;padding:clamp(56px,7vw,96px) max(5vw,18px) 28px}
+footer .wrap{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:36px}
+footer h2{color:#fff}
+footer h4{margin:0 0 8px;color:#fff;font-size:15px}
+footer a{color:var(--leaf)}
+.coords{color:var(--straw)}
+.base2{max-width:1240px;margin:48px auto 0;padding-top:18px;border-top:1px solid rgba(233,236,225,.14);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:13.5px;color:#8E9784}
+.flogo{background:#fff;border-radius:8px;padding:8px 12px;display:inline-block;margin-bottom:16px}
+.flogo img{height:44px;width:auto}
+@media(max-width:860px){footer .wrap{grid-template-columns:1fr}}
+@media(max-width:700px){.axis.y{display:none}.hero-in{padding-top:max(300px,36svh)}.hero::after{background:linear-gradient(0deg,rgba(18,23,14,.97) 0%,rgba(18,23,14,.9) 62%,rgba(18,23,14,0) 85%)}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav"><div class="wrap">
+  <a class="brand" href="#inicio"><span class="lg"><img src="img/logo.png" alt=""></span><span><b>TEG · UAM</b><small>Ecología y Conservación de Ecosistemas Terrestres</small></span></a>
+  <button id="mbtn" aria-expanded="false" aria-controls="menu">Menú</button>
+  <ul id="menu">
+    <li><a href="#grupo">Grupo</a></li><li><a href="#lineas">Líneas</a></li><li><a href="#equipo">Equipo</a></li><li><a href="#proyectos">Proyectos</a></li><li><a href="#publicaciones">Publicaciones</a></li><li><a href="#tesis">Tesis</a></li><li><a href="#novedades">Novedades</a></li><li><a href="#contacto">Contacto</a></li>
+  </ul>
+</div><div class="transect"><i id="prog"></i></div></header>
+
+<main>
+<!-- ============ HÉROE ============ -->
+<section class="hero" id="inicio" aria-label="Presentación">
+  <div class="spec" aria-hidden="true"><canvas id="sg"></canvas><canvas id="ov"></canvas></div>
+  <div class="axis y mono" aria-hidden="true"><span>10 kHz</span><span>7,5</span><span>5</span><span>2,5</span><span>0</span></div>
+  <div class="hero-in"><div class="wrap">
+    <h1>Escuchar, medir y conservar los <em>ecosistemas terrestres</em></h1>
+    <p class="lede">Somos el Grupo de Investigación de Ecología y Conservación de Ecosistemas Terrestres de la Universidad Autónoma de Madrid. Estudiamos cómo funcionan las estepas, los pastizales, los paisajes agrarios y las islas, y cómo hacer que su biodiversidad persista.</p>
+    <div class="btns"><a class="btn" href="#lineas">Qué investigamos</a><a class="btn ghost" href="#publicaciones">Publicaciones</a></div>
+  </div></div>
+  <div class="hero-foot"><div class="wrap">
+    <div class="stats" id="stats"></div>
+    <div class="det-legend mono"><i></i><span>Espectrograma simulado · detecciones de especies esteparias</span></div>
+  </div></div>
+</section>
+
+<!-- ============ GRUPO ============ -->
+<section class="band" id="grupo"><div class="wrap">
+  <p class="manifest rv">Un grupo consolidado de la UAM, vinculado al <b>CIBC-UAM</b>, que une trabajo de campo, nuevas tecnologías de seguimiento y transferencia a administraciones y empresas.</p>
+  <div class="aims rv">
+    <div><span class="mono">Conocer</span><h3 style="margin:6px 0 6px">Procesos ecológicos clave</h3><p class="mute">Nicho, interacciones, movimiento y dinámica de comunidades en ecosistemas terrestres.</p></div>
+    <div><span class="mono">Conservar</span><h3 style="margin:6px 0 6px">Criterios y herramientas</h3><p class="mute">Para la gestión de especies amenazadas, hábitats y recursos naturales.</p></div>
+    <div><span class="mono">Transferir</span><h3 style="margin:6px 0 6px">Formación y asesoramiento</h3><p class="mute">Docencia, divulgación y contratos con administraciones, ONG y empresas.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ LÍNEAS ============ -->
+<section class="band tint" id="lineas"><div class="wrap">
+  <div class="sec-head rv"><h2>Cinco líneas de investigación</h2><p class="mute">Del individuo al paisaje y de la escala local a la global. Abre cada línea para ver qué hacemos, quién lo hace y qué proyectos están en marcha.</p></div>
+  <div class="lines rv" id="lines"></div>
+</div></section>
+
+<!-- ============ EQUIPO ============ -->
+<section class="band" id="equipo"><div class="wrap">
+  <div class="sec-head rv"><h2>El equipo, ordenado por lo que investiga</h2><p class="mute">Cada punto es una persona; su posición resume en qué líneas trabaja. Los puntos con halo son la coordinación del grupo.</p></div>
+  <div class="ord rv">
+    <div><div class="fig" id="ordfig"><svg id="ordsvg" role="img" aria-label="Diagrama de ordenación de los miembros según sus líneas de investigación"></svg><div class="tip" id="tip"></div></div>
+    <p class="cap">Figura. Posición de cada miembro en el espacio de las cinco líneas (media de sus vectores de línea + ruido para separar puntos). No es un análisis estadístico.</p></div>
+    <div class="side">
+      <h3>Filtrar por línea</h3>
+      <div class="chips" id="ochips"></div>
+      <div style="margin-top:22px"><input class="search" id="oq" type="search" placeholder="Buscar a alguien…" aria-label="Buscar miembros"></div>
+      <p class="count" id="ocount"></p>
+    </div>
+  </div>
+  <div class="people" id="people"></div>
+</div></section>
+
+<!-- ============ PROYECTOS ============ -->
+<section class="band tint" id="proyectos"><div class="wrap">
+  <div class="sec-head rv"><h2>Proyectos en el tiempo</h2><p class="mute">Proyectos LIFE, del Plan Estatal, internacionales y contratos de transferencia. La línea discontinua marca hoy; pulsa un proyecto para ver su referencia, financiación e investigador/a principal.</p></div>
+  <div class="chips rv" id="pchips" style="margin-bottom:22px"></div>
+  <div class="gantt" id="gantt"></div>
+  <div class="legend"><span><i style="background:var(--olive)"></i>LIFE</span><span><i style="background:var(--leaf)"></i>Nacional</span><span><i style="background:#C2A73A"></i>Internacional</span><span><i style="background:repeating-linear-gradient(135deg,var(--leaf) 0 5px,#B9CB6F 5px 10px)"></i>Contrato</span><span><i style="border-left:1.5px dashed #C25A2E;width:2px;height:12px"></i>Hoy</span></div>
+</div></section>
+
+<!-- ============ PUBLICACIONES ============ -->
+<section class="band" id="publicaciones"><div class="wrap">
+  <div class="pub-top">
+    <div class="rv">
+      <h2>Publicaciones</h2>
+      <p class="mute" style="margin-top:14px">La producción del año en curso, recogida en la memoria anual del grupo.</p>
+      <div class="big" id="bign">0</div>
+      <p class="mono mute" style="margin-top:6px">artículos científicos en 2026</p>
+      <div style="margin-top:26px" id="meters"></div>
+    </div>
+    <div class="rv">
+      <div class="ptools"><input class="search" id="bq" type="search" placeholder="Autor, título, revista…" aria-label="Buscar publicaciones"><select id="by" aria-label="Año"></select><select id="bt" aria-label="Tipo"><option value="">Todo</option><option value="art">Artículos</option><option value="cap">Libros y capítulos</option><option value="prensa">Prensa</option></select></div>
+      <p class="count" id="bcount"></p>
+      <div id="pubs"></div>
+      <div class="more"><button class="btn ghost" id="bmore" style="color:var(--text)">Mostrar más</button></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ TESIS ============ -->
+<section class="band dark" id="tesis"><div class="wrap">
+  <div class="sec-head rv"><h2 style="color:#fff">Calendario de defensas</h2><p style="color:#C9CFBD">Tesis doctorales leídas y en curso dirigidas o tutorizadas por miembros del grupo, en la UAM y en universidades de Brasil, Paraguay y Costa Rica. Toca un punto para ver la tesis.</p></div>
+  <div class="tcal" id="tcal"></div>
+  <div class="tinfo" id="tinfo"><span class="mono">● paja: leída · ● verde: en curso</span></div>
+  <div class="tlist" id="tsum"></div><details class="tdet"><summary class="btn ghost">Ver todas las tesis</summary><div class="tlist" id="tlist"></div></details>
+</div></section>
+
+<!-- ============ NOVEDADES ============ -->
+<section class="band" id="novedades"><div class="wrap">
+  <div class="sec-head rv" style="align-items:center"><h2>Novedades</h2><div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><p class="mute">Premios, proyectos, ciencia abierta y divulgación.</p><div class="snav"><button id="sprev" aria-label="Anterior">←</button><button id="snext" aria-label="Siguiente">→</button></div></div></div>
+  <div class="strip" id="strip"></div>
+</div></section>
+
+<!-- ============ FORMACIÓN ============ -->
+<section class="band tint" id="formacion"><div class="wrap">
+  <div class="sec-head rv"><h2>Formación</h2><p class="mute">Los miembros del grupo imparten docencia en los grados de Biología y Ciencias Ambientales y dirigen tesis en el Programa de Doctorado en Ecología.</p></div>
+  <div class="cols3 rv">
+    <div><span class="mono mute">Máster oficial</span><h3 style="margin-top:6px">Máster en Ecología UAM-UCM</h3></div>
+    <div><span class="mono mute">Doctorado</span><h3 style="margin-top:6px">Programa de Doctorado en Ecología UAM-UCM</h3></div>
+    <div><span class="mono mute">Máster</span><h3 style="margin-top:6px">Máster en Espacios Naturales Protegidos</h3></div>
+    <div><span class="mono mute">TFG · TFM</span><h3 style="margin-top:6px">¿Quieres hacer tu TFG, TFM o tesis con nosotros?</h3><p class="mute" style="margin:6px 0 0">Escribe a la coordinación o a quien trabaje en la línea que te interesa.</p></div>
+  </div>
+</div></section>
+</main>
+
+<footer id="contacto">
+  <div class="wrap">
+    <div><div class="flogo"><img src="img/logo.png" alt="TEG · Terrestrial Ecology Group"></div><h2>Contacto</h2><p style="margin-top:12px">Coordinación: Diego Llusia y Pablo Acebes<br><a href="mailto:diego.llusia@uam.es">diego.llusia@uam.es</a> · <a href="mailto:pablo.acebes@uam.es">pablo.acebes@uam.es</a></p></div>
+    <div><h4>Dónde estamos</h4><p>Departamento de Ecología<br>Edificio de Biología, C/ Darwin 2<br>Campus de Cantoblanco, UAM<br>28049 Madrid</p><p class="mono coords">40.545° N · 3.692° W</p><p><a href="https://www.google.com/maps/search/?api=1&query=Departamento+de+Ecolog%C3%ADa+UAM+Calle+Darwin+2+Madrid">Abrir en el mapa →</a></p></div>
+    <div><h4>Enlaces</h4><p><a href="https://www.uam.es/ciencias/facultad/departamentos/ecologia">Departamento de Ecología</a><br><a href="https://www.uam.es/uam/cibc">CIBC-UAM</a><br><a href="https://www.uam.es/uam/investigacion/grupos-de-investigacion/detalle/f1-81">Ficha del grupo en la UAM</a><br><a href="https://www.uam.es">Universidad Autónoma de Madrid</a></p></div>
+  </div>
+  <div class="base2"><span>© 2026 TEG-UAM · Universidad Autónoma de Madrid</span><span>Web estática, sin cookies ni seguimiento</span></div>
+</footer>
+
+<script src="datos.js"></script>
+<script>
+{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const L=window.LINEAS||[],M=window.MIEMBROS||[],P=window.PROYECTOS||[],B=window.PUBLICACIONES||[],T=window.TESIS||[],N=window.NOVEDADES||[];
+const NOW=2026+10.8/12;
+const lineById=id=>L.find(l=>l.id===id);
+const mLines=m=>(m.lineas||'').split(/\s+/).filter(Boolean);
+const active=p=>p.fin>=2026;
+
+/* ---------- espectrograma ---------- */
+const sg=$('#sg'),ov=$('#ov'),sx=sg.getContext('2d'),ox=ov.getContext('2d');
+const COLS=720,ROWS=220,FMAX=10;
+sg.width=COLS;sg.height=ROWS;
+const stops=[[18,23,14],[34,46,22],[79,100,33],[146,170,50],[228,213,140],[252,250,232]];
+const cmap=v=>{v=Math.max(0,Math.min(.999,v))*(stops.length-1);const i=v|0,f=v-i,a=stops[i],b=stops[i+1];return[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f]};
+const SPECIES=[
+ {n:'Chersophilus duponti',kind:'whistle'},{n:'Alauda arvensis',kind:'trill'},{n:'Melanocorypha calandra',kind:'trill'},
+ {n:'Galerida theklae',kind:'phrase'},{n:'Tetrax tetrax',kind:'snort'},{n:'Pterocles orientalis',kind:'phrase'},
+ {n:'Calandrella brachydactyla',kind:'phrase'},{n:'Tettigoniidae',kind:'insect'}];
+let voices=[],boxes=[],col=0,rnd=Math.random;
+function spawn(){
+ const s=SPECIES[(rnd()*SPECIES.length)|0];const len={whistle:150,trill:120,phrase:80,snort:40,insect:110}[s.kind]*(0.7+rnd()*.6);
+ const base={whistle:2.2+rnd()*1.2,trill:3+rnd()*1.5,phrase:3.5+rnd()*2,snort:1+rnd()*.6,insect:7.4+rnd()*1.2}[s.kind];
+ const v={s,len,age:0,base,seed:rnd()*100,amp:(s.kind==='insect'?.28:.5)+rnd()*.35,lo:99,hi:0,start:col};voices.push(v);
+}
+function freqAt(v){const t=v.age,k=v.s.kind,sd=v.seed;
+ if(k==='whistle'){const note=Math.floor(t/22),ph=(t%22)/22;if(ph>.72)return null;const steps=[0,.25,.55,.9,1.3,.4];return v.base+steps[note%6]+ph*.35;}
+ if(k==='trill'){return v.base+.9*Math.sin(t*.55+sd)+.4*Math.sin(t*.13);}
+ if(k==='phrase'){const seg=Math.floor(t/9),ph=(t%9)/9;if(ph>.65)return null;return v.base+Math.sin(seg*2.3+sd)*1.1-ph*.6;}
+ if(k==='snort'){return (t%10<5)?v.base+rnd()*.15:null;}
+ if(k==='insect'){return (t%6<3)?v.base:null;}}
+const colData=sx.createImageData(1,ROWS);
+function step(){
+ sx.drawImage(sg,-1,0);
+ const e=new Float32Array(ROWS);
+ for(let r=0;r<ROWS;r++){const f=FMAX*(1-r/ROWS);e[r]=.05+.045*rnd()+.18*Math.exp(-f*1.6)*(0.6+rnd()*.6);}
+ for(const v of voices){const f=freqAt(v);v.age++;if(f==null)continue;
+  const harm=v.s.kind==='insect'?[[1,1]]:[[1,1],[2,.32]];
+  for(const[h,a]of harm){const fh=f*h;if(fh>FMAX)continue;const r0=(1-fh/FMAX)*ROWS,w=v.s.kind==='snort'?7:v.s.kind==='insect'?10:2.2;
+   for(let r=Math.max(0,r0-w*3|0);r<Math.min(ROWS,r0+w*3);r++){e[r]+=v.amp*a*Math.exp(-((r-r0)**2)/(2*w*w));}
+   if(h===1){v.lo=Math.min(v.lo,fh-(v.s.kind==='insect'?.4:.25));v.hi=Math.max(v.hi,fh+(v.s.kind==='insect'?.4:.25));}}}
+ for(let r=0;r<ROWS;r++){const[c0,c1,c2]=cmap(e[r]);const i=r*4;colData.data[i]=c0;colData.data[i+1]=c1;colData.data[i+2]=c2;colData.data[i+3]=255;}
+ sx.putImageData(colData,COLS-1,0);
+ for(const v of voices.filter(v=>v.age>=v.len)){if(v.hi>0)boxes.push({x0:v.start,x1:col,lo:v.lo,hi:v.hi,n:v.s.n,c:(.72+rnd()*.26).toFixed(2),born:col});}
+ voices=voices.filter(v=>v.age<v.len);
+ if(voices.length<2&&rnd()<.022)spawn();
+ boxes=boxes.filter(b=>col-b.x1<COLS);
+ col++;}
+function drawOv(){
+ const W=ov.clientWidth,H=ov.clientHeight,dpr=Math.min(2,devicePixelRatio||1);
+ if(ov.width!==W*dpr||ov.height!==H*dpr){ov.width=W*dpr;ov.height=H*dpr;}
+ ox.setTransform(dpr,0,0,dpr,0,0);ox.clearRect(0,0,W,H);
+ const kx=W/COLS,ky=H/ROWS;
+ ox.font='500 12px "IBM Plex Mono",monospace';
+ for(const b of boxes){const x=W-(col-b.x0)*kx,x2=W-(col-b.x1)*kx,y=(1-b.hi/FMAX)*ROWS*ky,y2=(1-b.lo/FMAX)*ROWS*ky;
+  const a=Math.min(1,(col-b.born)/25)*(W<700?Math.max(0,Math.min(1,(H*.3-y2)/30)):Math.max(0,Math.min(1,(x/W-.42)/.2)));if(a<=0)continue;ox.globalAlpha=a;ox.strokeStyle='#E4D58C';ox.lineWidth=1.25;ox.strokeRect(x,y,x2-x,y2-y);
+  const lab=b.n+'  '+b.c;const tw=ox.measureText(lab).width;ox.fillStyle='rgba(18,23,14,.82)';ox.fillRect(x,y-19,tw+10,17);
+  ox.fillStyle='#E4D58C';ox.fillText(lab,x+5,y-6);}
+ ox.globalAlpha=1;}
+for(let i=0;i<COLS;i++)step();
+drawOv();
+let heroVis=true;new IntersectionObserver(es=>{heroVis=es[0].isIntersecting}).observe($('.hero'));
+let acc=0,last=performance.now();
+function loop(t){const dt=Math.min(64,t-last);last=t;
+ if(heroVis&&!document.hidden){acc+=dt*.055;while(acc>=1){step();acc--;}drawOv();}
+ requestAnimationFrame(loop);}
+if(!RM)requestAnimationFrame(loop);
+addEventListener('resize',drawOv);
+
+/* ---------- cifras ---------- */
+const art26=B.filter(b=>b.a===2026&&b.tipo==='art');
+const stats=[[M.length,'investigadores'],[P.filter(active).length,'proyectos activos'],[art26.length,'artículos en 2026'],[T.filter(t=>t.estado==='curso').length,'tesis en curso']];
+$('#stats').innerHTML=stats.map(s=>`<div><b data-n="${s[0]}">0</b><span>${s[1]}</span></div>`).join('');
+const countUp=(el,n,d=1400)=>{if(RM){el.textContent=n;return}const t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/d);el.textContent=Math.round(n*(1-(1-k)**3));if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)};
+$$('#stats b').forEach((b,i)=>setTimeout(()=>countUp(b,+b.dataset.n),300+i*150));
+
+/* ---------- líneas ---------- */
+const glyphs={vertebrados:'M2 26 C10 26 12 10 20 10 S30 22 36 18 S46 6 54 8',agraria:'M2 30 H54 M2 22 H54 M2 14 H54 M10 6 V34 M28 6 V34 M46 6 V34',pastizales:'M4 32 C6 18 8 12 10 6 M14 32 C14 22 18 14 22 10 M26 32 C26 20 28 14 30 8 M38 32 C38 24 42 16 46 12 M50 32 C50 24 52 18 54 14',evaluacion:'M2 30 L54 30 M8 30 L8 18 L48 18 L48 30 M18 18 L18 8 M38 18 L38 8 M14 8 H42',biogeografia:'M6 28 C10 14 18 10 24 16 S30 30 38 20 S50 8 54 12 M4 34 H54'};
+$('#lines').innerHTML=L.map((l,i)=>{const ppl=M.filter(m=>mLines(m).includes(l.id)).map(m=>m.nombre.split(' ').slice(0,2).join(' '));const pr=P.filter(p=>p.linea===l.id&&active(p));
+ return `<div class="ln" id="l-${l.id}"><button aria-expanded="false"><svg class="glyph" viewBox="0 0 56 36" aria-hidden="true"><path d="${glyphs[l.id]||glyphs.biogeografia}"/></svg><h3>${esc(l.nombre)}</h3><span class="plus" aria-hidden="true">+</span></button>
+ <div class="body"><div><div class="inner"><img src="${esc(l.img)}" alt=""><div><p>${esc(l.texto)}</p><div class="tags">${(l.claves||[]).map(k=>`<span class="tag">${esc(k)}</span>`).join('')}</div>
+ ${ppl.length?`<p class="who"><b>Quién:</b> ${esc(ppl.join(', '))}</p>`:''}${pr.length?`<p class="who"><b>${pr.length} proyectos activos</b>, entre ellos ${esc(pr.slice(0,2).map(p=>p.t.split(':')[0]).join(' y '))}.</p>`:''}</div></div></div></div></div>`}).join('');
+$$('.ln button').forEach(b=>b.addEventListener('click',()=>{const d=b.parentElement,o=!d.hasAttribute('open');d.toggleAttribute('open',o);b.setAttribute('aria-expanded',o)}));
+$('.ln')?.setAttribute('open','');$('.ln button')?.setAttribute('aria-expanded','true');
+
+/* ---------- ordenación ---------- */
+const svg=$('#ordsvg'),tip=$('#tip');let oLine='',oQ='';
+const hash=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return h};
+const ang=i=>-Math.PI/2+Math.PI/L.length+i*2*Math.PI/L.length;
+const pts=M.map(m=>{const ls=mLines(m);let x=0,y=0;ls.forEach(id=>{const i=L.findIndex(l=>l.id===id);if(i>=0){x+=Math.cos(ang(i));y+=Math.sin(ang(i))}});
+ if(ls.length){x/=ls.length;y/=ls.length}const h=hash(m.nombre);const j=.16;x=x*.6+((h&255)/255-.5)*j*2;y=y*.6+(((h>>8)&255)/255-.5)*j*2;return{m,x,y,ls}});
+let ordDrawn=false;
+function drawOrd(anim){const W=svg.clientWidth,H=svg.clientHeight;if(!W)return;const small=W<520;const cx=W/2,cy=H/2+6,R=Math.min(W,H)*(small?.33:.4);
+ let s=`<g stroke="var(--rule)" stroke-width="1"><line x1="${cx-R*1.15}" y1="${cy}" x2="${cx+R*1.15}" y2="${cy}"/><line x1="${cx}" y1="${cy-R*1.15}" x2="${cx}" y2="${cy+R*1.15}"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke-dasharray="2 5"/></g>`;
+ if(!small)s+=`<text x="${cx+R*1.15}" y="${cy-8}" text-anchor="end" class="mono" fill="var(--mute)" font-size="11">eje 1</text><text x="${cx-8}" y="${cy+R*1.15}" text-anchor="end" class="mono" fill="var(--mute)" font-size="11">eje 2</text>`;
+ L.forEach((l,i)=>{const x=cx+Math.cos(ang(i))*R,y=cy+Math.sin(ang(i))*R,on=!oLine||oLine===l.id;const lx=cx+Math.cos(ang(i))*(R+14),ly=cy+Math.sin(ang(i))*(R+14);const anc=Math.cos(ang(i))>.3?'start':Math.cos(ang(i))<-.3?'end':'middle';
+  s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${on?'var(--acc)':'var(--rule)'}" stroke-width="${oLine===l.id?2.2:1.3}" marker-end="url(#ar)"/><text x="${lx}" y="${ly+(Math.sin(ang(i))>.3?12:Math.sin(ang(i))<-.3?-4:4)}" text-anchor="${anc}" font-size="${small?11:13}" font-weight="650" fill="${on?'var(--text)':'var(--mute)'}" style="cursor:pointer" data-line="${l.id}">${esc(small?l.corto:l.corto)}</text>`});
+ pts.forEach((p,i)=>{const x=cx+p.x*R,y=cy+p.y*R,hit=(!oLine||p.ls.includes(oLine))&&(!oQ||norm(p.m.nombre).includes(oQ));const r=p.m.coord?7.5:5.5;
+  s+=`<circle class="pt" data-i="${i}" cx="${anim?cx:x}" cy="${anim?cy:y}" data-x="${x}" data-y="${y}" r="${r}" fill="${hit?(p.m.coord?'var(--olive)':'var(--leaf)'):'var(--rule)'}" stroke="${p.m.coord?'var(--leaf)':'var(--card)'}" stroke-width="${p.m.coord?3:1.5}" opacity="${hit?1:.55}" style="cursor:pointer;transition:cx .9s cubic-bezier(.2,.7,.2,1) ${i*12}ms,cy .9s cubic-bezier(.2,.7,.2,1) ${i*12}ms,fill .3s"/>`});
+ svg.innerHTML=`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="var(--acc)"/></marker></defs>`+s;
+ if(anim)requestAnimationFrame(()=>requestAnimationFrame(()=>svg.querySelectorAll('.pt').forEach(c=>{c.setAttribute('cx',c.dataset.x);c.setAttribute('cy',c.dataset.y)})));}
+const ordRO=new ResizeObserver(()=>drawOrd(false));ordRO.observe(svg);
+new IntersectionObserver((es,o)=>{if(es[0].isIntersecting&&!ordDrawn){ordDrawn=true;drawOrd(!RM);o.disconnect()}},{threshold:.3}).observe(svg);
+svg.addEventListener('pointermove',e=>{const c=e.target.closest('.pt');if(!c){tip.style.opacity=0;return}const p=pts[+c.dataset.i];const r=svg.getBoundingClientRect();tip.style.left=(e.clientX-r.left)+'px';tip.style.top=(e.clientY-r.top)+'px';tip.innerHTML=`${esc(p.m.nombre)}<small>${esc(p.m.puesto||p.ls.map(id=>lineById(id)?.corto).join(' · ')||'TEG-UAM')}</small>`;tip.style.opacity=1});
+svg.addEventListener('pointerleave',()=>tip.style.opacity=0);
+svg.addEventListener('click',e=>{const t=e.target.closest('[data-line]');if(t){setLine(oLine===t.dataset.line?'':t.dataset.line);return}const c=e.target.closest('.pt');if(c){const el=document.getElementById('p-'+c.dataset.i);if(el){$$('.person.hl').forEach(x=>x.classList.remove('hl'));el.classList.add('hl');el.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'})}}});
+$('#ochips').innerHTML=[['','Todas']].concat(L.map(l=>[l.id,l.corto])).map(c=>`<button class="chip" data-v="${c[0]}" aria-pressed="${!c[0]}">${esc(c[1])}</button>`).join('');
+function setLine(v){oLine=v;$$('#ochips .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.v===v));drawOrd(false);drawPeople()}
+$('#ochips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)setLine(b.dataset.v)});
+$('#oq').addEventListener('input',e=>{oQ=norm(e.target.value);drawOrd(false);drawPeople()});
+function drawPeople(){const list=pts.map((p,i)=>({...p,i})).filter(p=>(!oLine||p.ls.includes(oLine))&&(!oQ||norm(p.m.nombre).includes(oQ))).sort((a,b)=>(b.m.coord?1:0)-(a.m.coord?1:0)||a.m.nombre.localeCompare(b.m.nombre,'es'));
+ $('#ocount').textContent=list.length+(list.length===1?' persona':' personas');
+ $('#people').innerHTML=list.map(p=>{const em=p.m.email?(p.m.email.includes('@')?p.m.email:p.m.email+'@uam.es'):'';
+  return `<div class="person${p.m.coord?' c':''}" id="p-${p.i}"><i class="dot"></i><div><b>${esc(p.m.nombre)}</b><span>${esc(p.m.puesto||p.ls.map(id=>lineById(id)?.corto).join(' · '))}</span>${em?`<a href="mailto:${esc(em)}">${esc(em)}</a>`:''}${p.m.orcid?` <a href="https://orcid.org/${esc(p.m.orcid)}" aria-label="ORCID">· ORCID</a>`:''}</div></div>`}).join('')||'<p class="mute">Nadie coincide con la búsqueda.</p>'}
+drawPeople();
+
+/* ---------- Gantt ---------- */
+const Y0=2013,Y1=2032,pct=y=>(y-Y0)/(Y1-Y0)*100;let pF='act';
+const TIPOS={life:'LIFE',nacional:'Nacional',internacional:'Internacional',contrato:'Contrato'};
+$('#pchips').innerHTML=[['act','En curso'],['all','Todos']].concat(Object.entries(TIPOS)).map(c=>`<button class="chip" data-v="${c[0]}" aria-pressed="${c[0]===pF}">${esc(c[1])}</button>`).join('');
+function drawGantt(){const list=P.filter(p=>pF==='all'||(pF==='act'?active(p):p.tipo===pF)).sort((a,b)=>(active(b)-active(a))||b.ini-a.ini||b.fin-a.fin);
+ const yrs=[2014,2017,2020,2023,2026,2029,2032].map(y=>`<span style="left:${pct(y)}%">${y}</span>`).join('');
+ $('#gantt').innerHTML=`<div class="g-axis mono"><span class="lab">${list.length} proyectos</span><div class="g-years">${yrs}</div></div>`+list.map((p,i)=>`<div class="g-row"><button aria-expanded="false"><span class="g-t">${esc(p.t)}<small>${p.ini===p.fin?p.ini:p.ini+'–'+p.fin} · ${esc(p.fin_)}</small></span><span class="track"><i class="bar ${esc(p.tipo)}" style="left:${pct(p.ini)}%;width:${Math.max(1.2,pct(p.fin+1)-pct(p.ini))}%;transition-delay:${Math.min(i,20)*40}ms"></i><i class="today" style="left:${pct(NOW)}%"></i></span></button><div class="g-more">${p.ref?`<b>Referencia:</b> ${esc(p.ref)} · `:''}${p.ip?`<b>IP:</b> ${esc(p.ip)} · `:''}${p.eur?`<b>Presupuesto:</b> ${esc(p.eur)} · `:''}<b>Línea:</b> ${esc(lineById(p.linea)?.nombre||'')}</div></div>`).join('');
+ const g=$('#gantt');g.classList.remove('in');requestAnimationFrame(()=>requestAnimationFrame(()=>{if(gSeen)g.classList.add('in')}))}
+let gSeen=false;new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){gSeen=true;$('#gantt').classList.add('in');o.disconnect()}},{threshold:.1}).observe($('#gantt'));
+$('#pchips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;pF=b.dataset.v;$$('#pchips .chip').forEach(c=>c.setAttribute('aria-pressed',c===b));drawGantt()});
+$('#gantt').addEventListener('click',e=>{const b=e.target.closest('.g-row>button');if(!b)return;const r=b.parentElement;r.classList.toggle('open');b.setAttribute('aria-expanded',r.classList.contains('open'))});
+drawGantt();
+
+/* ---------- publicaciones ---------- */
+const q1=art26.filter(b=>b.q==='Q1').length,oa=art26.filter(b=>b.oa).length;
+$('#meters').innerHTML=[['En revistas Q1',q1],['En acceso abierto',oa]].map(m=>`<div class="meter"><div class="row"><span>${m[0]}</span><b>${m[1]} de ${art26.length}</b></div><div class="tr"><i data-w="${art26.length?Math.round(m[1]/art26.length*100):0}"></i></div></div>`).join('');
+new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){countUp($('#bign'),art26.length);$$('#meters i').forEach(i=>i.style.width=i.dataset.w+'%');o.disconnect()}},{threshold:.4}).observe($('#bign'));
+const years=[...new Set(B.map(b=>b.a))].sort((a,b)=>b-a);
+$('#by').innerHTML='<option value="">Todos los años</option>'+years.map(y=>`<option>${y}</option>`).join('');
+let shown=10;
+function drawPubs(){const q=norm($('#bq').value),y=$('#by').value,t=$('#bt').value;
+ const list=B.filter(b=>(!y||String(b.a)===y)&&(!t||b.tipo===t)&&(!q||norm([b.au,b.t,b.r].join(' ')).includes(q)));
+ $('#bcount').textContent=list.length+(list.length===1?' publicación':' publicaciones');
+ $('#pubs').innerHTML=list.slice(0,shown).map(b=>{const href=b.doi?'https://doi.org/'+b.doi:(b.url||'https://scholar.google.com/scholar?q='+encodeURIComponent(b.t));
+  return `<div class="pub"><span class="y mono">${b.a}</span><div><a class="t" href="${esc(href)}">${esc(b.t)}</a><div class="a">${esc(b.au)}. <em>${esc(b.r)}</em>${b.v?' '+esc(b.v):''}${b.q?`<span class="badge q">${esc(b.q)}</span>`:''}${b.oa?'<span class="badge oa">Open Access</span>':''}${b.tipo!=='art'?`<span class="badge k">${b.tipo==='cap'?'Libro/capítulo':'Prensa'}</span>`:''}</div></div></div>`}).join('')||'<p class="mute">Ninguna publicación coincide con la búsqueda.</p>';
+ $('#bmore').style.display=list.length>shown?'':'none'}
+['#bq','#by','#bt'].forEach(id=>$(id).addEventListener('input',()=>{shown=10;drawPubs()}));
+$('#bmore').addEventListener('click',()=>{shown+=15;drawPubs()});
+drawPubs();
+
+/* ---------- tesis ---------- */
+const tYear=t=>{const m=String(t.fecha).match(/20\d\d/);return m?+m[0]:null};
+const TY0=2023.5,TY1=2030.5,tp=y=>(y-TY0)/(TY1-TY0)*100;
+const byYear={};T.forEach((t,i)=>{const y=tYear(t)??'?';(byYear[y]=byYear[y]||[]).push(i)});
+let th='<div class="base"></div>';for(let y=2024;y<=2030;y++)th+=`<span class="yr mono" style="left:${tp(y)}%">${y}</span>`;
+Object.entries(byYear).forEach(([y,ids])=>{if(y==='?')return;ids.forEach((i,k)=>{th+=`<button class="dot ${T[i].estado}" data-i="${i}" style="left:${tp(+y)+((k%2)?1.1:-1.1)}%;bottom:${40+Math.floor(k/2)*20}px;transition-delay:${(+y-2024)*120+k*40}ms" aria-label="${esc(T[i].autor)}"></button>`})});
+$('#tcal').innerHTML=th;
+const noDate=(byYear['?']||[]).length;
+new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){$('#tcal').classList.add('in');o.disconnect()}},{threshold:.3}).observe($('#tcal'));
+const showT=i=>{const t=T[i];$('#tinfo').innerHTML=`<b style="color:#fff">${esc(t.autor)}</b> · ${esc(t.t)}<br><span class="mono" style="color:#AEB6A2">${t.estado==='leida'?'Leída':'Prevista'} ${esc(t.fecha)} · Dir.: ${esc(t.dir)} · ${esc(t.prog)}</span>`};
+$('#tcal').addEventListener('click',e=>{const d=e.target.closest('.dot');if(d)showT(+d.dataset.i)});
+$('#tcal').addEventListener('pointerover',e=>{const d=e.target.closest('.dot');if(d)showT(+d.dataset.i)});
+const lei=T.filter(t=>t.estado==='leida').length,cur=T.length-lei;
+$('#tsum').innerHTML=`<div><b>${lei} tesis leídas</b><span>recogidas en las memorias de 2024 y 2026</span></div><div><b>${cur} tesis en curso</b><span>${noDate?noDate+' sin fecha de lectura prevista (no aparecen en el calendario)':'con fecha prevista'}</span></div>`;$('#tlist').innerHTML=T.map(t=>`<div><b>${esc(t.autor)}</b><span>${esc(t.t)} · ${t.estado==='leida'?'leída':'prevista'} ${esc(t.fecha||'s.f.')}</span></div>`).join('');
+
+/* ---------- novedades ---------- */
+$('#strip').innerHTML=N.map(n=>`<article><img src="${esc(n.img)}" alt=""><div class="in2"><span class="mono">${esc(n.fecha)} · ${esc(n.tipo)}</span><h3 style="margin-top:6px">${n.url?`<a href="${esc(n.url)}" style="color:inherit">${esc(n.t)}</a>`:esc(n.t)}</h3><p>${esc(n.txt)}</p></div></article>`).join('');
+const sc=d=>{const s=$('#strip'),w=s.querySelector('article')?.offsetWidth||300;s.scrollBy({left:d*(w+18),behavior:RM?'auto':'smooth'})};
+$('#sprev').addEventListener('click',()=>sc(-1));$('#snext').addEventListener('click',()=>sc(1));
+$('#strip').addEventListener('keydown',e=>{if(e.key==='ArrowRight')sc(1);if(e.key==='ArrowLeft')sc(-1)});$('#strip').tabIndex=0;
+
+/* ---------- navegación, progreso, reveal ---------- */
+const nav=$('#nav'),prog=$('#prog'),links=$$('#menu a');
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+function onScroll(){const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;prog.style.width=(h>0?y/h*100:0)+'%';
+ nav.classList.toggle('solid',y>innerHeight*.75-70);
+ let cur=-1;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<120)cur=i});links.forEach((a,i)=>a.classList.toggle('on',i===cur))}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+$('#mbtn').addEventListener('click',()=>{const o=$('#menu').classList.toggle('open');$('#mbtn').setAttribute('aria-expanded',o)});
+links.forEach(a=>a.addEventListener('click',()=>{$('#menu').classList.remove('open');$('#mbtn').setAttribute('aria-expanded','false')}));
+const rvo=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rvo.unobserve(e.target)}}),{threshold:.12});
+$$('.rv').forEach(el=>rvo.observe(el));
+}
+</script>
+</body>
+</html>
