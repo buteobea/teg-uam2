@@ -152,8 +152,9 @@ const hash = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0))
 const PTS = M.map((m, i) => { const ls = mLines(m); let x = 0, y = 0; ls.forEach(id => { const k = L.findIndex(l => l.id === id); if (k >= 0) { x += Math.cos(ang(k)); y += Math.sin(ang(k)); } }); if (ls.length) { x /= ls.length; y /= ls.length; } const h = hash(m.nombre); x = x * .6 + ((h & 255) / 255 - .5) * .32; y = y * .6 + (((h >> 8) & 255) / 255 - .5) * .32; return { m, x, y, ls, i, id: slug(m.nombre) }; });
 
 /* ---------- publicaciones: utilidades ---------- */
+const TIPOPUB = { art: 'Artículo', cap: 'Libro/capítulo', div: 'Divulgación', nota: 'Editorial/carta/nota', prensa: 'Prensa' };
 const pubHref = b => b.doi ? 'https://doi.org/' + b.doi : (b.url || 'https://scholar.google.com/scholar?q=' + encodeURIComponent(b.t));
-const pubHTML = (b, i) => `<div class="pub"><span class="y mono">${b.a}</span><div><a class="t" href="${esc(pubHref(b))}">${esc(b.t)}</a><div class="a">${esc(b.au)}. <em>${esc(b.r)}</em>${b.v ? ' ' + esc(b.v) : ''}${b.q ? `<span class="badge q">${esc(b.q)}</span>` : ''}${b.oa ? '<span class="badge oa">Open Access</span>' : ''}${b.tipo !== 'art' ? `<span class="badge k">${b.tipo === 'cap' ? 'Libro/capítulo' : 'Prensa'}</span>` : ''}<button class="cite" data-c="${i}">Copiar cita</button></div></div></div>`;
+const pubHTML = (b, i) => `<div class="pub"><span class="y mono">${b.a}</span><div><a class="t" href="${esc(pubHref(b))}">${esc(b.t)}</a><div class="a">${b.au ? esc(b.au) + '. ' : ''}<em>${esc(b.r)}</em>${b.v ? ' ' + esc(b.v) : ''}${b.q ? `<span class="badge q">${esc(b.q)}</span>` : ''}${b.oa ? '<span class="badge oa">Open Access</span>' : ''}${b.tipo !== 'art' ? `<span class="badge k ${esc(b.tipo)}">${TIPOPUB[b.tipo] || ''}</span>` : ''}<button class="cite" data-c="${i}">Copiar cita</button></div></div></div>`;
 const citeText = b => `${b.au} (${b.a}). ${b.t}. ${b.r}${b.v ? ', ' + b.v : ''}.${b.doi ? ' https://doi.org/' + b.doi : (b.url ? ' ' + b.url : '')}`;
 document.addEventListener('click', e => { const c = e.target.closest('.cite'); if (!c) return; const b = B[+c.dataset.c]; navigator.clipboard?.writeText(citeText(b)).then(() => toast('Cita copiada'), () => toast('No se pudo copiar')); });
 const yearSeries = () => {
@@ -234,13 +235,13 @@ inicio() {
   const ser = yearSeries(), mx = Math.max(1, ...ser.map(s => s.n || 0)), bw = 360 / ser.length;
   const vPub = `<svg ${vb}>${ser.map((s, i) => s.n == null ? `<rect x="${20 + i * bw + 3}" y="120" width="${bw - 6}" height="50" fill="none" stroke="var(--mute)" stroke-dasharray="3 3"/>` : `<rect x="${20 + i * bw + 3}" y="${170 - s.n / mx * 150}" width="${bw - 6}" height="${s.n / mx * 150}" fill="var(--leaf)"/><text x="${20 + i * bw + bw / 2}" y="185" text-anchor="middle" font-size="11" fill="var(--mute)">${s.y}</text>`).join('')}</svg>`;
   const ty = T.map(t => +(String(t.fecha).match(/20\d\d/) || [0])[0]).filter(Boolean), tcount = {};
-  const vTes = `<svg ${vb}><line x1="20" x2="380" y1="160" y2="160" stroke="var(--mute)"/>${ty.map(y => { tcount[y] = (tcount[y] || 0) + 1; return `<circle cx="${30 + (y - 2024) / 6 * 340 + (tcount[y] % 2 ? -6 : 6)}" cy="${150 - Math.floor((tcount[y] - 1) / 2) * 14}" r="5.5" fill="var(--leaf)"/>`; }).join('')}</svg>`;
+  const vTes = `<svg ${vb}><line x1="20" x2="380" y1="160" y2="160" stroke="var(--mute)"/>${ty.map(y => { tcount[y] = (tcount[y] || 0) + 1; return `<circle cx="${30 + (y - 2018) / 12 * 340 + (tcount[y] % 2 ? -5 : 5)}" cy="${150 - Math.floor((tcount[y] - 1) / 2) * 12}" r="4.5" fill="var(--leaf)"/>`; }).join('')}</svg>`;
   const doors = [['lineas.html', 'Líneas de investigación', `${L.length} líneas, del individuo al paisaje y de lo local a lo global.`, vLines],
     ['equipo.html', 'Equipo', `${M.length} personas ordenadas según lo que investigan, con su ficha individual.`, vTeam],
     ['proyectos.html', 'Proyectos', `${P.filter(active).length} proyectos en curso: LIFE, Plan Estatal, internacionales y transferencia.`, vProj],
     ['mapa.html', 'Dónde trabajamos', `Trabajo de campo y colaboraciones en ${new Set(G.map(g => g.pais)).size} países de cuatro continentes.`, vMap],
-    ['publicaciones.html', 'Publicaciones', `Evolución anual, cuartiles, acceso abierto y buscador con citas.`, vPub],
-    ['tesis.html', 'Tesis doctorales', `${T.filter(t => t.estado === 'curso').length} tesis en curso y su calendario de defensas.`, vTes]];
+    ['publicaciones.html', 'Publicaciones', `${B.length} publicaciones desde ${Math.min(...B.map(b => b.a))}: evolución anual, buscador y citas.`, vPub],
+    ['tesis.html', 'Tesis doctorales', `${T.filter(t => t.estado === 'leida').length} tesis leídas y ${T.filter(t => t.estado === 'curso').length} en curso, en un calendario de defensas.`, vTes]];
   $('#doors').innerHTML = doors.map(d => `<a class="door rv" href="${d[0]}"><div class="viz">${d[3]}</div><div class="in"><h3>${d[1]}</h3><p>${d[2]}</p><span class="go">Entrar →</span></div></a>`).join('');
   // destacado: proyecto LIFE más reciente en curso
   const f = P.filter(p => p.tipo === 'life' && active(p)).sort((a, b) => b.ini - a.ini)[0];
@@ -317,8 +318,9 @@ miembro() {
       ${pr.length ? `<h3 style="margin-top:24px">Proyectos</h3><ul class="plist">${pr.map(x => `<li>${esc(x.t)}<small>${x.ini}–${x.fin} · ${esc(x.fin_)}${active(x) ? ' · en curso' : ''}</small></li>`).join('')}</ul>` : ''}
       ${th.length ? `<h3 style="margin-top:24px">Tesis</h3><ul class="plist">${th.map(t => `<li>${esc(t.autor)}: ${esc(t.t)}<small>${t.estado === 'leida' ? 'Leída' : 'En curso'} ${esc(t.fecha)} · ${esc(t.prog)}</small></li>`).join('')}</ul>` : ''}
     </div>
-    <div><h3>Publicaciones</h3>${pubs.length ? pubs.map(x => pubHTML(x.b, x.i)).join('') : '<p class="mute">Aún no hay publicaciones suyas en la web.</p>'}
+    <div><h3>Publicaciones (${pubs.length})</h3><div id="mpubs">${pubs.length ? pubs.slice(0, 12).map(x => pubHTML(x.b, x.i)).join('') : '<p class="mute">Aún no hay publicaciones suyas en la web.</p>'}</div>${pubs.length > 12 ? `<button class="btn ghost" id="mmore" style="color:var(--text);margin-top:16px">Ver las ${pubs.length}</button>` : ''}
       <p class="note" style="margin-top:14px">Se enlazan automáticamente buscando su firma en las autorías de las publicaciones recogidas en la web.</p></div></div>`;
+  $('#mmore')?.addEventListener('click', e => { $('#mpubs').innerHTML = pubs.map(x => pubHTML(x.b, x.i)).join(''); e.target.remove(); });
 },
 
 /* ---------------- PROYECTOS ---------------- */
@@ -362,8 +364,8 @@ mapa() {
       let proj, proj2 = null, box2 = null;
       if (k === 'w') proj = d3.geoNaturalEarth1().fitExtent([[10, 10], [Wd - 10, H - 10]], { type: 'Sphere' });
       else {
-        proj = d3.geoMercator().fitExtent([[10, 30], [Wd - 10, H - 10]], { type: 'MultiPoint', coordinates: [[-9.6, 43.9], [4.4, 36.0]] });
-        box2 = [12, H - H * .24 - 12, Wd * .34, H * .24];
+        proj = d3.geoMercator().fitExtent([[14, 36], [Wd - 14, H * .76]], { type: 'MultiPoint', coordinates: [[-9.6, 43.9], [4.4, 36.0]] });
+        box2 = [14, H * .79, Math.min(Wd * .42, (H * .19) * 2.4), H * .19];
         proj2 = d3.geoMercator().fitExtent([[box2[0] + 6, box2[1] + 6], [box2[0] + box2[2] - 6, box2[1] + box2[3] - 6]], { type: 'MultiPoint', coordinates: [[-18.2, 29.4], [-13.4, 27.6]] });
       }
       const path = d3.geoPath(proj); let s = '';
@@ -405,14 +407,14 @@ publicaciones() {
       if (d.n == null) { s += `<rect x="${x}" y="${y(mx * .35)}" width="${w}" height="${y(0) - y(mx * .35)}" fill="none" stroke="var(--mute)" stroke-dasharray="4 4"/><text x="${x + w / 2}" y="${y(mx * .35) - 8}" text-anchor="middle" font-size="11" fill="var(--mute)">sin datos</text>`; }
       else { const h = y(0) - y(d.n), hq = y(0) - y(d.q1), tr = anim ? `style="transform-origin:${x}px ${y(0)}px;transform:scaleY(0);transition:transform 1s cubic-bezier(.2,.7,.2,1) ${i * 90}ms"` : '';
         s += `<g class="gb" ${tr}><rect x="${x}" y="${y(d.n)}" width="${w}" height="${h}" fill="var(--leaf)" rx="2"/>${d.qk ? `<rect x="${x}" y="${y(d.q1)}" width="${w}" height="${hq}" fill="var(--olive)" rx="2"/>` : ''}</g><text x="${x + w / 2}" y="${y(d.n) - 8}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">${d.n}</text>`; }
-      s += `<text x="${x + w / 2}" y="${H - 12}" text-anchor="middle" font-size="12" fill="var(--mute)" class="mono">${d.y}</text>`; });
+      s += `<text x="${x + w / 2}" y="${H - 12}" text-anchor="middle" font-size="12" fill="var(--mute)" class="mono">${d.y}${d.y === NOWY ? '*' : ''}</text>`; });
     svg.innerHTML = s;
     if (anim) requestAnimationFrame(() => requestAnimationFrame(() => svg.querySelectorAll('.gb').forEach(g => g.style.transform = 'scaleY(1)')));
   }
   const ro = new ResizeObserver(() => chart(false)); ro.observe(fig);
   new IntersectionObserver((es, o) => { if (es[0].isIntersecting && !seen) { seen = true; chart(!RM); o.disconnect(); } }, { threshold: .3 }).observe(fig);
   const missing = ser.filter(s => s.n == null).map(s => s.y);
-  $('#chartnote').textContent = `Barras: artículos en revistas recogidos en la web; en oscuro, los publicados en revistas Q1 (cuando consta el cuartil).${missing.length ? ' Años sin datos: ' + missing.join(', ') + '.' : ''}`;
+  $('#chartnote').textContent = `Artículos en revistas científicas recogidos en las memorias anuales del grupo; en oscuro, los publicados en revistas Q1 (cuando consta el cuartil). ${NOWY} es el año en curso.${missing.length ? ' Años sin datos: ' + missing.join(', ') + '.' : ''}`;
   // listado
   const years = [...new Set(B.map(b => b.a))].sort((a, b) => b - a);
   $('#by').innerHTML = '<option value="">Todos los años</option>' + years.map(y => `<option>${y}</option>`).join('');
@@ -430,13 +432,14 @@ publicaciones() {
 /* ---------------- TESIS ---------------- */
 tesis() {
   pageArt('pastizales', 16);
+  const isUAM = t => /UAM|Autónoma de Madrid|^Ecolog[ií]a\.?$/i.test(t.prog);
   const lei = T.filter(t => t.estado === 'leida'), curT = T.filter(t => t.estado === 'curso');
-  kpis('#kp', [[curT.length, 'tesis en curso'], [lei.length, 'tesis leídas recogidas'], [T.filter(t => !/UAM/.test(t.prog)).length, 'en universidades de otros países']]);
+  kpis('#kp', [[curT.length, 'tesis en curso'], [lei.length, 'tesis leídas recogidas'], [T.filter(t => !isUAM(t)).length, 'en otras universidades']]);
   const tYear = t => { const m = String(t.fecha).match(/20\d\d/); return m ? +m[0] : null; };
-  const TY0 = 2023.5, TY1 = 2030.5, tp = y => (y - TY0) / (TY1 - TY0) * 100, by = {};
+  const TY0 = 2017.5, TY1 = 2030.5, tp = y => (y - TY0) / (TY1 - TY0) * 100, by = {};
   T.forEach((t, i) => { const y = tYear(t) ?? '?'; (by[y] = by[y] || []).push(i); });
-  let h = '<div class="base"></div>'; for (let y = 2024; y <= 2030; y++) h += `<span class="yr mono" style="left:${tp(y)}%">${y}</span>`;
-  Object.entries(by).forEach(([y, ids]) => { if (y === '?') return; ids.forEach((i, k) => h += `<button class="dot ${T[i].estado}" data-i="${i}" style="left:${tp(+y) + ((k % 2) ? 1.1 : -1.1)}%;bottom:${40 + Math.floor(k / 2) * 20}px;transition-delay:${(+y - 2024) * 120 + k * 40}ms" aria-label="${esc(T[i].autor)}"></button>`); });
+  let h = '<div class="base"></div>'; for (let y = 2018; y <= 2030; y++) h += `<span class="yr mono" style="left:${tp(y)}%">${y}</span>`;
+  Object.entries(by).forEach(([y, ids]) => { if (y === '?') return; ids.forEach((i, k) => h += `<button class="dot ${T[i].estado}" data-i="${i}" style="left:${tp(+y) + ((k % 2) ? .9 : -.9)}%;bottom:${40 + Math.floor(k / 2) * 20}px;transition-delay:${(+y - 2018) * 80 + k * 40}ms" aria-label="${esc(T[i].autor)}"></button>`); });
   $('#tcal').innerHTML = h;
   new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { $('#tcal').classList.add('in'); o.disconnect(); } }, { threshold: .3 }).observe($('#tcal'));
   const showT = i => { const t = T[i]; $$('#tcal .dot').forEach(d => d.classList.toggle('on', +d.dataset.i === i)); $('#tinfo').innerHTML = `<b style="color:#fff">${esc(t.autor)}</b> · ${esc(t.t)}<br><span class="mono" style="color:#AEB6A2">${t.estado === 'leida' ? 'Leída' : 'Prevista'} ${esc(t.fecha)} · Dir.: ${esc(t.dir)} · ${esc(t.prog)}</span>`; };
@@ -444,8 +447,8 @@ tesis() {
   $('#tcal').addEventListener('pointerover', e => { const d = e.target.closest('.dot'); if (d) showT(+d.dataset.i); });
   $('#tnote').textContent = (by['?'] || []).length ? `${by['?'].length} tesis en curso no tienen fecha prevista y no aparecen en el calendario.` : '';
   let f = '';
-  $('#tchips').innerHTML = [['', 'Todas'], ['curso', 'En curso'], ['leida', 'Leídas'], ['uam', 'UAM'], ['ext', 'Otros países']].map(c => `<button class="chip" data-v="${c[0]}" aria-pressed="${c[0] === f}">${c[1]}</button>`).join('');
-  const draw = () => { const list = T.filter(t => !f || (f === 'uam' ? /UAM/.test(t.prog) : f === 'ext' ? !/UAM/.test(t.prog) : t.estado === f)).sort((a, b) => (tYear(a) || 9999) - (tYear(b) || 9999));
+  $('#tchips').innerHTML = [['', 'Todas'], ['curso', 'En curso'], ['leida', 'Leídas'], ['uam', 'UAM'], ['ext', 'Otras universidades']].map(c => `<button class="chip" data-v="${c[0]}" aria-pressed="${c[0] === f}">${c[1]}</button>`).join('');
+  const draw = () => { const list = T.filter(t => !f || (f === 'uam' ? isUAM(t) : f === 'ext' ? !isUAM(t) : t.estado === f)).sort((a, b) => (tYear(a) || 9999) - (tYear(b) || 9999));
     $('#tl').innerHTML = list.map(t => `<div><b>${esc(t.autor)}</b><span>${esc(t.t)}</span><span class="mono">${t.estado === 'leida' ? 'Leída' : 'Prevista'} ${esc(t.fecha || 's. f.')} · ${esc(t.prog)} · Dir.: ${esc(t.dir)}</span></div>`).join(''); };
   $('#tchips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; f = b.dataset.v; $$('#tchips .chip').forEach(c => c.setAttribute('aria-pressed', c === b)); draw(); });
   draw();
@@ -455,6 +458,8 @@ tesis() {
 novedades() {
   pageArt('vertebrados', 18);
   $('#news').innerHTML = N.map((n, i) => newsCard(n, i)).join('') || '<p class="empty">Todavía no hay novedades.</p>';
+  $('#premios').innerHTML = (W.PREMIOS || []).map(p => `<li><b>${p.url ? `<a href="${esc(p.url)}">${esc(p.t)}</a>` : esc(p.t)}</b><small>${p.a} · ${esc(p.quien)}</small></li>`).join('');
+  $('#activ').innerHTML = (W.ACTIVIDADES || []).map(a => `<li><b>${esc(a.t)}</b><small>${esc(a.fecha)} · ${esc(a.lugar)}${a.quien ? ' · ' + esc(a.quien) : ''}</small></li>`).join('');
   const press = B.filter(b => b.tipo === 'prensa');
   $('#press').innerHTML = press.map(b => `<li><a href="${esc(pubHref(b))}">${esc(b.t)}</a><small>${esc(b.au)} · ${esc(b.r)} ${b.a}</small></li>`).join('');
 },
@@ -464,6 +469,7 @@ contacto() {
   pageArt('evaluacion', 20);
   const co = M.filter(m => m.coord);
   $('#coord').innerHTML = co.map(m => `<a class="person c" href="miembro.html?id=${slug(m.nombre)}"><span class="av">${esc(initials(m.nombre))}</span><div><b>${esc(m.nombre)}</b><span>${esc(email(m))}</span></div></a>`).join('');
+  $('#estancias').innerHTML = (W.ESTANCIAS || []).map(e => `<li><b>${esc(e.quien)}</b> · ${esc(e.prog)}<small>${esc(e.origen)} · ${esc(e.fecha)} · ${esc(e.tema)}</small></li>`).join('');
   $('#ofertas').innerHTML = O.length ? O.map(o => `<div><span class="mono mute">${esc(o.tipo || '')}</span><h3 style="margin-top:6px">${esc(o.t)}</h3><p class="mute">${esc(o.txt || '')}${o.contacto ? ' · ' + esc(o.contacto) : ''}</p></div>`).join('') : `<div><h3>¿Quieres hacer tu TFG, TFM o tesis con nosotros?</h3><p class="mute" style="margin:6px 0 0">Ahora mismo no hay ofertas publicadas. Escribe a la coordinación o a quien trabaje en la línea que te interese: consulta el <a href="equipo.html">equipo</a> y las <a href="lineas.html">líneas</a>.</p></div>`;
 }
 };

@@ -162,7 +162,8 @@ p{margin:0 0 1em;max-width:68ch}
 .av img{width:100%;height:100%;object-fit:cover}
 .person.c .av{border-color:var(--leaf);background:var(--leaf);color:#12170E}
 .person b{display:block;font-weight:650;line-height:1.3}
-.person span{display:block;font-size:13.5px;color:var(--mute)}
+.person div span{display:block;font-size:13.5px;color:var(--mute)}
+.av{flex:none;line-height:1;text-align:center}
 
 /* ---------- ficha de miembro ---------- */
 .profile{display:grid;grid-template-columns:120px minmax(0,1fr);gap:28px;align-items:center}
@@ -194,9 +195,9 @@ p{margin:0 0 1em;max-width:68ch}
 @media(max-width:700px){.g-axis,.g-row>button{grid-template-columns:1fr;gap:6px}.g-axis .lab{display:none}}
 
 /* ---------- mapa ---------- */
-.maps{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.9fr);gap:18px}
+.maps{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.9fr);gap:18px;align-items:stretch}
 .mapfig{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
-#world{aspect-ratio:1.9/1}#spain{aspect-ratio:1.25/1}
+#world{aspect-ratio:1.9/1}#spain{min-height:100%}
 .mapfig svg{position:absolute;inset:0;width:100%;height:100%}
 .mapfig .lab{position:absolute;left:14px;top:12px;z-index:2;color:var(--mute)}
 .land{fill:light-dark(#E4E8D4,#222A1B);stroke:light-dark(#fff,#10140C);stroke-width:.5}
@@ -214,7 +215,7 @@ p{margin:0 0 1em;max-width:68ch}
 .places button:hover,.places button.on{color:var(--acc)}
 .places button small{display:block;color:var(--mute);font-size:13px}
 .mapfail{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--mute)}
-@media(max-width:900px){.maps{grid-template-columns:1fr}}
+@media(max-width:900px){.maps{grid-template-columns:1fr}#spain{min-height:0;aspect-ratio:1/1}}
 
 /* ---------- publicaciones ---------- */
 .chartfig{position:relative;height:320px;background:var(--card);border:1px solid var(--rule);border-radius:8px}
@@ -227,6 +228,14 @@ p{margin:0 0 1em;max-width:68ch}
 .pub .a em{color:var(--text)}
 .pub .cite{all:unset;cursor:pointer;font-size:12.5px;color:var(--acc);margin-left:8px;font-weight:600}
 .badge{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:4px;margin-left:6px;vertical-align:1px}
+.badge.k.div,.badge.k.nota{border-color:var(--leaf)}
+.timeline{list-style:none;margin:0;padding:0;border-left:2px solid var(--leaf)}
+.timeline li{position:relative;padding:0 0 22px 22px}
+.timeline li::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--olive)}
+.timeline small{display:block;color:var(--mute)}
+.ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:18px}
+.ways>div{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:20px}
+.ways p{font-size:14.5px;color:var(--mute);margin:6px 0 0}
 .badge.q{background:var(--ink);color:var(--straw)}.badge.oa{background:var(--leaf);color:#12170E}.badge.k{border:1px solid var(--rule);color:var(--mute)}
 .meter{margin-bottom:16px}
 .meter .row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
