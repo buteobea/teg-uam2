@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team · TEG-UAM</title>
+<meta name="description" content="Members of TEG-UAM.">
+<link rel="icon" href="../img/logo.png">
+<link rel="alternate" hreflang="es" href="../equipo.html">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-page="equipo">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Breadcrumb"><a href="index.html">TEG-UAM</a><span>/</span><span>Team</span></nav>
+  <h1>The team, arranged by what they research</h1>
+  <p class="lede">Each dot is a person and its position sums up the lines they work on. Click a dot or a name to open their profile.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="ord rv">
+    <div><div class="fig" id="ordfig"><svg id="ordsvg" role="img" aria-label="Ordination diagram of members by research line"></svg><div class="tip" id="tip"></div></div>
+    <p class="cap">Position of each member in the space of the five lines (mean of their line vectors plus a small jitter to separate dots). It is a depiction, not a statistical analysis.</p></div>
+    <div><h3 style="margin-bottom:10px">Filter by line</h3><div class="chips" id="ochips"></div>
+      <div style="margin-top:22px"><input class="search" id="oq" type="search" placeholder="Search for someone…" aria-label="Search members"></div><p class="count" id="ocount"></p></div>
+  </div>
+  <div class="people" id="people"></div>
+  <div id="former" style="margin-top:72px"></div>
+</div></section>
+</main>
+<script src="../datos.js"></script>
+<script src="../datos-auto.js"></script>
+<script src="../laminas.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

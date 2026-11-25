@@ -1,0 +1,31 @@
+# Busca publicaciones nuevas de los miembros del grupo en OpenAlex
+# el día 1 y el día 15 de cada mes (cada dos semanas) y las añade a datos-auto.js.
+# También se puede lanzar a mano: pestaña «Actions» → «Actualizar publicaciones» → «Run workflow».
+name: Actualizar publicaciones
+on:
+  schedule:
+    - cron: "23 5 1,15 * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Buscar publicaciones nuevas
+        run: node herramientas/actualizar-publicaciones.mjs
+      - name: Guardar cambios
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "Actualización automática TEG"
+            git config user.email "actions@users.noreply.github.com"
+            git add datos-auto.js herramientas/autores-openalex.json
+            git commit -m "Publicaciones: actualización automática $(date +%Y-%m-%d)"
+            git push
+          else
+            echo "Sin cambios."
+          fi

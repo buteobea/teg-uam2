@@ -6,6 +6,7 @@
 <title>TEG-UAM · Ecología y Conservación de Ecosistemas Terrestres</title>
 <meta name="description" content="Grupo de Investigación de Ecología y Conservación de Ecosistemas Terrestres (TEG-UAM), Universidad Autónoma de Madrid.">
 <link rel="icon" href="img/logo.png">
+<link rel="alternate" hreflang="en" href="en/index.html">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -13,14 +14,14 @@
 <body data-page="inicio">
 <main>
 <section class="hero" aria-label="Presentación">
-  <div class="spec" aria-hidden="true"><canvas id="sg"></canvas><canvas id="ov"></canvas></div>
+  <div class="spec" aria-hidden="true"></div>
   <div class="axis mono" aria-hidden="true"><span>10 kHz</span><span>7,5</span><span>5</span><span>2,5</span><span>0</span></div>
   <div class="hero-in"><div class="wrap">
     <h1>Escuchar, medir y conservar los <em>ecosistemas terrestres</em></h1>
     <p class="lede">Somos el Grupo de Investigación de Ecología y Conservación de Ecosistemas Terrestres de la Universidad Autónoma de Madrid. Estudiamos cómo funcionan las estepas, los pastizales, los paisajes agrarios y las islas, y cómo hacer que su biodiversidad persista.</p>
     <div class="btns"><a class="btn" href="lineas.html">Qué investigamos</a><a class="btn ghost" href="equipo.html">Conoce al equipo</a></div>
   </div></div>
-  <div class="hero-foot"><div class="wrap"><div class="kpis" id="stats" style="margin-top:0"></div><div class="det-legend mono"><i></i><span>Espectrograma simulado · detecciones de especies esteparias</span></div></div></div>
+  <div class="hero-foot"><div class="wrap"><div class="kpis" id="stats" style="margin-top:0"></div><div class="det-legend mono"><i></i><span>Espectrograma real</span></div></div></div>
 </section>
 <section class="band"><div class="wrap">
   <p class="manifest rv">Un grupo consolidado de la UAM, vinculado al <b>CIBC-UAM</b>, que une trabajo de campo, nuevas tecnologías de seguimiento y transferencia a administraciones y empresas.</p>
@@ -41,6 +42,9 @@
 </div></section>
 </main>
 <script src="datos.js"></script>
+<script src="datos-auto.js"></script>
+<script src="laminas.js"></script>
+<script src="espectrograma.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

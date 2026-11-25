@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · TEG-UAM</title>
+<meta name="description" content="Research and transfer projects of TEG-UAM.">
+<link rel="icon" href="../img/logo.png">
+<link rel="alternate" hreflang="es" href="../proyectos.html">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-page="proyectos">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Breadcrumb"><a href="index.html">TEG-UAM</a><span>/</span><span>Projects</span></nav>
+  <h1>Projects over time</h1>
+  <p class="lede">LIFE projects, Spanish national plan projects, international projects and transfer contracts. The dashed line marks today; click a project for its page.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="sec-head rv"><div><h3 style="margin-bottom:14px">Ongoing projects by type</h3><div id="mix"></div></div><div><input class="search" id="pq" type="search" placeholder="Search by title, reference, PI or funder…" aria-label="Search projects"><div class="chips" id="pchips" style="margin-top:14px"></div></div></div>
+  <div class="gantt" id="gantt"></div>
+  <div class="legend"><span><i style="background:var(--olive)"></i>LIFE</span><span><i style="background:var(--leaf)"></i>National</span><span><i style="background:var(--ochre)"></i>International</span><span><i style="background:repeating-linear-gradient(135deg,var(--leaf) 0 5px,#B9CB6F 5px 10px)"></i>Contract</span><span><i style="border-left:1.5px dashed var(--red);width:2px;height:12px;border-radius:0"></i>Today</span></div>
+</div></section>
+</main>
+<script src="../datos.js"></script>
+<script src="../datos-auto.js"></script>
+<script src="../laminas.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

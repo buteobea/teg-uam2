@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publications · TEG-UAM</title>
+<meta name="description" content="Scientific publications of TEG-UAM.">
+<link rel="icon" href="../img/logo.png">
+<link rel="alternate" hreflang="es" href="../publicaciones.html">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-page="publicaciones">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Breadcrumb"><a href="index.html">TEG-UAM</a><span>/</span><span>Publications</span></nav>
+  <h1>Publications</h1>
+  <p class="lede">Papers, books and outreach by the group, and how output has changed over the years. Search by author, title or journal and copy a citation in one click.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="sec-head rv"><h2>Output per year</h2><p class="mute" id="chartnote"></p></div>
+  <div class="chartfig rv" id="chart"><svg role="img" aria-label="Papers published per year"></svg></div>
+  <div class="legend"><span><i style="background:var(--leaf)"></i>Papers</span><span><i style="background:var(--olive)"></i>In Q1 journals</span><span><i style="border:1.5px dashed var(--mute)"></i>Year without data</span></div>
+</div></section>
+<section class="band tint"><div class="wrap">
+  <div class="tools"><input class="search" id="bq" type="search" placeholder="Author, title, journal…" aria-label="Search publications"><select class="sel" id="by" aria-label="Year"></select><select class="sel" id="bt" aria-label="Type"><option value="">All</option><option value="art">Papers</option><option value="cap">Books and chapters</option><option value="div">Outreach</option><option value="nota">Editorials, letters and notes</option><option value="prensa">Press</option></select><label style="display:flex;gap:8px;align-items:center;min-height:46px"><input type="checkbox" id="boa"> Open access only</label></div>
+  <p class="count" id="bcount"></p>
+  <div id="pubs"></div>
+  <div style="margin-top:18px"><button class="btn ghost" id="bmore" style="color:var(--text)">Show more</button></div>
+</div></section>
+</main>
+<script src="../datos.js"></script>
+<script src="../datos-auto.js"></script>
+<script src="../laminas.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

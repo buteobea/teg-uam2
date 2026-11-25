@@ -288,3 +288,18 @@ footer p{font-size:14.5px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 
 .ficha{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0 0 12px}.ficha dt{color:var(--mute);font-size:14px}.ficha dd{margin:0}
+
+/* ---------- añadidos: idioma, espectrograma real, antiguos, fichas de proyecto ---------- */
+.skip{position:absolute;left:-999px;top:8px;z-index:99;background:var(--leaf);color:#12170E;padding:8px 14px;border-radius:8px}.skip:focus{left:8px}
+.nav ul a.lang{border:1.5px solid currentColor;border-radius:999px;padding:6px 12px;margin:4px 0 4px 8px;font-size:13px;letter-spacing:.04em}
+.spec.noreal svg{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+.spec .strip{position:absolute;inset:0 auto 0 0;display:flex;height:100%;width:max-content;animation:sweep linear infinite}
+.spec .tile{position:relative;height:100%;flex:none}
+.spec .tile img{height:100%;width:auto;display:block;max-width:none}
+.spec .det{position:absolute;border:1.5px solid var(--straw);border-radius:2px}
+.spec .det em{position:absolute;left:-1.5px;bottom:100%;font:500 12px "IBM Plex Mono",monospace;font-style:italic;color:var(--straw);background:rgba(18,23,14,.82);padding:2px 6px;white-space:nowrap}
+@keyframes sweep{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.spec .strip{animation:none}}
+.person.old .av{filter:grayscale(1);opacity:.8}
+.ficha.big{grid-template-columns:max-content 1fr;gap:10px 20px;font-size:15.5px;border-top:1.5px solid var(--text);padding-top:16px}
+.ptime{margin-top:28px}.ptime .track{background-image:none}.ptime .bar{top:5px;bottom:5px}
