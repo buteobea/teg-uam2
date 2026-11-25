@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tesis doctorales · TEG-UAM</title>
+<meta name="description" content="Tesis doctorales del TEG-UAM.">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="tesis">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Ruta"><a href="index.html">TEG-UAM</a><span>/</span><span>Tesis</span></nav>
+  <h1>Calendario de defensas</h1>
+  <p class="lede">Tesis leídas y en curso dirigidas o tutorizadas por miembros del grupo, en la UAM y en universidades de Brasil, Paraguay y otros países.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band dark"><div class="wrap">
+  <div class="tcal" id="tcal"></div>
+  <div class="tinfo" id="tinfo"><span class="mono">● paja: leída · ● verde: en curso · pasa el ratón o toca un punto</span></div>
+  <p class="mono" style="color:#8E9784" id="tnote"></p>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="chips" id="tchips" style="margin-bottom:20px"></div>
+  <div class="tl" id="tl"></div>
+</div></section>
+</main>
+<script src="datos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

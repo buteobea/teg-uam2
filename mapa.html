@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dónde trabajamos · TEG-UAM</title>
+<meta name="description" content="Ámbito nacional e internacional del TEG-UAM.">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="mapa">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Ruta"><a href="index.html">TEG-UAM</a><span>/</span><span>Dónde trabajamos</span></nav>
+  <h1>Del páramo soriano a las sabanas amazónicas</h1>
+  <p class="lede">Zonas de trabajo de campo y colaboraciones institucionales del grupo, en España y en el resto del mundo.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="chips" id="mchips" style="margin-bottom:18px"></div>
+  <div class="maps">
+    <div class="mapfig" id="world"><span class="lab mono">Ámbito internacional</span><svg role="img" aria-label="Mapa del mundo con los lugares de trabajo del grupo"></svg></div>
+    <div class="mapfig" id="spain"><span class="lab mono">Ámbito nacional</span><svg role="img" aria-label="Mapa de España con los lugares de trabajo del grupo"></svg></div>
+  </div>
+  <div class="tip" id="mtip"></div>
+  <div class="legend"><span><i style="background:var(--red);border-radius:50%;width:12px;height:12px"></i>Sede</span><span><i style="background:var(--olive);border-radius:50%;width:12px;height:12px"></i>Trabajo de campo</span><span><i style="border:2px solid var(--olive);border-radius:50%;width:12px;height:12px"></i>Colaboración institucional</span><span>Ubicaciones aproximadas</span></div>
+  <div class="places" id="places"></div>
+</div></section>
+</main>
+<script src="datos.js"></script>
+<script src="lib/d3.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

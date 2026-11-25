@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipo · TEG-UAM</title>
+<meta name="description" content="Miembros del TEG-UAM.">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="equipo">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Ruta"><a href="index.html">TEG-UAM</a><span>/</span><span>Equipo</span></nav>
+  <h1>El equipo, ordenado por lo que investiga</h1>
+  <p class="lede">Cada punto es una persona y su posición resume en qué líneas trabaja. Pulsa un punto o un nombre para abrir su ficha.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="ord rv">
+    <div><div class="fig" id="ordfig"><svg id="ordsvg" role="img" aria-label="Diagrama de ordenación de los miembros según sus líneas de investigación"></svg><div class="tip" id="tip"></div></div>
+    <p class="cap">Posición de cada miembro en el espacio de las cinco líneas (media de sus vectores de línea más un pequeño desplazamiento para separar puntos). Es una representación, no un análisis estadístico.</p></div>
+    <div><h3 style="margin-bottom:10px">Filtrar por línea</h3><div class="chips" id="ochips"></div>
+      <div style="margin-top:22px"><input class="search" id="oq" type="search" placeholder="Buscar a alguien…" aria-label="Buscar miembros"></div><p class="count" id="ocount"></p></div>
+  </div>
+  <div class="people" id="people"></div>
+</div></section>
+</main>
+<script src="datos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
