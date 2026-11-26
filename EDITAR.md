@@ -170,6 +170,40 @@ Cuando se cubra, bórrala. Si la lista queda vacía (`window.OFERTAS = [];`), la
 - Coordenadas: en Google Maps, clic derecho sobre el sitio → copia los dos números (el primero es `lat`, el segundo `lon`).
 - `pais` en español y con el nombre habitual (España, Brasil, Chile…).
 
+### Añadir un financiador → `FINANCIADORES`
+
+```js
+  { "n": "Nombre de la entidad", "n_en": "Name in English", "tipo": "publico", "url": "https://web-de-la-entidad.org",
+    "logo": "img/logos/entidad.png", "buscar": "Nombre corto|Sigla" },
+```
+
+- `tipo`: `publico`, `internacional` o `empresa` (las empresas aparecen marcadas como «Transferencia» y al final).
+- `buscar`: palabras que aparecen en el campo `fin_` de sus proyectos, separadas por `|`. Sirve para que la web cuente sola cuántos proyectos ha financiado.
+- `logo` es opcional: sin logo se muestra el nombre. Sube los logos a `img/logos/` (PNG o SVG con fondo transparente).
+
+### Añadir un colaborador → `COLABORADORES`
+
+```js
+  { "n": "Nombre de la institución", "pais": "Portugal", "url": "https://..." },
+```
+
+Son las instituciones con las que el grupo colabora de forma estable. Las coautorías con otras instituciones salen solas en la página **Red**.
+
+### Añadir fotos a la galería → `GALERIA`
+
+1. Sube las fotos a la carpeta `img/galeria/` (ver [Subir una foto](#5-subir-una-foto)). Pueden ser grandes: la web las reduce sola al publicar.
+2. Añade un bloque por foto:
+
+```js
+window.GALERIA = [
+  { "img": "img/galeria/anillamiento-2026.jpg", "pie": "Anillamiento de alondras en Layna", "pie_en": "Ringing larks in Layna",
+    "autor": "Nombre Apellido", "fecha": "abril 2026", "lugar": "Soria", "linea": "vertebrados" },
+];
+```
+
+- `autor` es obligatorio: hay que indicar siempre quién hizo la foto. Sube solo fotos propias o con permiso, y evita que se reconozca a personas que no hayan dado su consentimiento.
+- La página **Galería** aparece sola en el menú en cuanto hay al menos una foto.
+
 ### Activar las estadísticas de visitas → `CONFIG`
 
 Escribe el código de la cuenta de GoatCounter entre las comillas: `goatcounter: "teguam"`.
@@ -194,15 +228,21 @@ Los títulos de publicaciones y tesis no se traducen.
 
 ## 7. Lo que se actualiza solo
 
-- **Publicaciones:** los días 1 y 15 de cada mes, la web busca en [OpenAlex](https://openalex.org) los artículos nuevos de cada miembro y los añade (archivo `datos-auto.js`; no lo edites a mano). Funciona mucho mejor si cada persona tiene su `orcid` en `MIEMBROS`. Para lanzarlo en el momento: pestaña **Actions → Publicaciones → Run workflow**.
+- **Publicaciones:** los días 1 y 15 de cada mes, la web busca en [OpenAlex](https://openalex.org) los artículos nuevos de cada miembro y los añade (archivo `datos-auto.js`; no lo edites a mano). Funciona mucho mejor si cada persona tiene su `orcid` en `MIEMBROS`. Para lanzarlo en el momento: pestaña **Actions → Actualizar publicaciones → Run workflow**.
+- **Citas, índice h y red de colaboraciones:** se actualizan a la vez que las publicaciones, también desde OpenAlex (archivo `datos-citas.js`; no lo edites a mano).
 - **Gráficas, cifras de la portada, fichas personales y páginas de proyecto:** se calculan solas a partir de `datos.js`.
 - **Espectrograma de la portada:** es una grabación real de alondra ricotí de [Xeno-canto (XC838241)](https://xeno-canto.org/838241), licencia CC BY-NC-SA 4.0, sin sonido. Para cambiarlo por otra grabación, ver el `README.md`.
 
 ## 8. Si algo sale mal
 
-**La página se queda en blanco o faltan cosas tras un cambio:** casi siempre falta una coma o unas comillas.
+**La web comprueba sola cada cambio.** Al guardar `datos.js`, GitHub revisa el archivo en un minuto:
 
-- **Arreglarlo:** abre `datos.js`, pulsa el lápiz y revisa el bloque que tocaste con [las 5 reglas](#3-las-5-reglas-para-no-romper-nada). GitHub suele marcar en rojo la zona con el error.
+- ✅ **Tic verde:** todo bien, la web se actualiza.
+- ❌ **Cruz roja:** hay un error y **la web no se actualiza** (sigue publicada la última versión buena, así que nadie ve la web rota). Para ver qué pasa, pulsa la ✗ (junto al nombre del último cambio, en la página principal del repositorio) → **Details**. Verás un mensaje en español con la línea exacta, por ejemplo:
+  > datos.js línea 76: Proyecto «LIFE Iber-Ricotí…»: "ini" y "fin" deben ser años sin comillas.
+- Los **avisos** (triángulo amarillo, p. ej. «falta la traducción al inglés») no impiden publicar.
+
+**Para arreglar un error:** abre `datos.js`, pulsa el lápiz, ve a la línea indicada (o a la anterior) y revísala con [las 5 reglas](#3-las-5-reglas-para-no-romper-nada).
 - **Deshacerlo:** en `datos.js`, pulsa **History** (arriba a la derecha), abre la versión anterior a tu cambio, pulsa **…** → **View file**, copia el contenido y pégalo en el editor. Nada se pierde: GitHub guarda todas las versiones y quién hizo cada cambio.
 
 **No veo mi cambio:** espera 2 minutos y recarga con Ctrl + Shift + R. En la pestaña **Actions** se ve si la publicación ha terminado (tic verde).

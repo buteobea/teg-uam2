@@ -67,10 +67,67 @@ const S = {
   thReadK: 'completed theses listed', otherUni: 'at other universities', noDate: n => `${n} ongoing theses have no expected date and are not shown on the calendar.`, uam: 'UAM', otherU: 'Other universities', readF: 'Completed', progF: 'Ongoing',
   noNews: 'No news yet.', offer: 'Would you like to do your BSc, MSc or PhD with us?', offerTxt: 'There are no open calls right now. Write to the coordinators or to whoever works in the line you are interested in: see the <a href="equipo.html">team</a> and the <a href="lineas.html">research lines</a>.' }
 }[EN ? 'en' : 'es'];
+Object.assign(S, EN ? {
+  navRed: 'Network', navGal: 'Gallery',
+  citT: 'Citations according to OpenAlex', nCit: n => n === 1 ? '1 citation' : n + ' citations', sortNew: 'Newest first', sortCit: 'Most cited', sortL: 'Sort',
+  impact: 'Impact', totCit: 'citations in total', hGroup: 'group h-index', citedPct: 'of publications cited', mostCited: 'Most cited',
+  impNote: d => `Citations according to OpenAlex for the publications listed on this site (matched by DOI or title), updated on ${d}. The group h-index is the largest number h of publications with at least h citations each. Citation counts differ between databases (Web of Science, Scopus or Google Scholar give different figures).`,
+  hIdx: 'h-index', citsAll: 'Citations', worksAll: 'Works', impM: d => `According to OpenAlex, whole career (updated on ${d}).`, oaProfile: 'OpenAlex profile', kpiH: 'h-index (OpenAlex)',
+  netMembers: 'connected people', netPairs: 'co-author pairs within the group', netInst: 'co-authoring institutions', netCountries: 'countries',
+  onlyGroup: 'Group only', withInst: 'With institutions', topInst: 'Institutions with most joint publications', works: n => n === 1 ? '1 joint publication' : n + ' joint publications',
+  together: n => n === 1 ? '1 publication together' : n + ' publications together', pubsN: n => n === 1 ? '1 publication' : n + ' publications',
+  netNote: d => `A line joins two group members when they co-sign at least one publication on this site, and a member with an institution when that institution appears in the affiliation of a co-author of their publications (OpenAlex, updated on ${d}). Only the institutions with most joint work are drawn. Line width: number of publications. Drag the nodes to rearrange them.`,
+  legMember: 'Group member', legFormer: 'Former member', legES: 'Spanish institution', legIntl: 'Institution abroad', countriesH: 'Co-authoring institutions by country', netAria: 'Co-authorship network between group members and other institutions', netEmpty: 'Citation data are not available yet.',
+  funders: 'Supported by', fundersTxt: 'Organisations that fund or have funded the group\'s projects and contracts.', nProjF: n => n === 1 ? '1 project' : n + ' projects', transfer: 'Knowledge transfer',
+  collabsH: 'We work with', collabsTxt: (n, c) => `The group also co-authors publications with ${n} institutions in ${c} countries.`, seeNet: 'See the collaboration network',
+  galEmpty: 'There are no photos in the gallery yet.', galEmptyTxt: 'Group members can add them by following the editing guide.', close: 'Close', prev: 'Previous', next: 'Next', photoBy: 'Photo'
+} : {
+  navRed: 'Red', navGal: 'Galería',
+  citT: 'Citas según OpenAlex', nCit: n => n === 1 ? '1 cita' : n + ' citas', sortNew: 'Más recientes', sortCit: 'Más citadas', sortL: 'Ordenar',
+  impact: 'Impacto', totCit: 'citas en total', hGroup: 'índice h del grupo', citedPct: 'de las publicaciones, citadas', mostCited: 'La más citada',
+  impNote: d => `Citas según OpenAlex de las publicaciones recogidas en esta web (identificadas por DOI o por título), actualizadas el ${d}. El índice h del grupo es el mayor número h de publicaciones con al menos h citas cada una. Las cifras cambian según la base de datos (Web of Science, Scopus o Google Scholar dan valores distintos).`,
+  hIdx: 'Índice h', citsAll: 'Citas', worksAll: 'Trabajos', impM: d => `Según OpenAlex, para toda su trayectoria (actualizado el ${d}).`, oaProfile: 'Perfil en OpenAlex', kpiH: 'índice h (OpenAlex)',
+  netMembers: 'personas conectadas', netPairs: 'parejas de coautores dentro del grupo', netInst: 'instituciones coautoras', netCountries: 'países',
+  onlyGroup: 'Solo el grupo', withInst: 'Con instituciones', topInst: 'Instituciones con más publicaciones conjuntas', works: n => n === 1 ? '1 publicación conjunta' : n + ' publicaciones conjuntas',
+  together: n => n === 1 ? '1 publicación juntos' : n + ' publicaciones juntos', pubsN: n => n === 1 ? '1 publicación' : n + ' publicaciones',
+  netNote: d => `Una línea une a dos personas del grupo cuando firman juntas al menos una publicación de esta web, y a una persona con una institución cuando esa institución aparece en la afiliación de algún coautor de sus publicaciones (OpenAlex, actualizado el ${d}). Solo se dibujan las instituciones con más trabajos conjuntos. Grosor de la línea: número de publicaciones. Puedes arrastrar los nodos.`,
+  legMember: 'Miembro del grupo', legFormer: 'Antiguo miembro', legES: 'Institución española', legIntl: 'Institución extranjera', countriesH: 'Instituciones coautoras por país', netAria: 'Red de coautorías entre miembros del grupo y otras instituciones', netEmpty: 'Los datos de citas aún no están disponibles.',
+  funders: 'Con el apoyo de', fundersTxt: 'Entidades que financian o han financiado proyectos y contratos del grupo.', nProjF: n => n === 1 ? '1 proyecto' : n + ' proyectos', transfer: 'Transferencia',
+  collabsH: 'Colaboramos con', collabsTxt: (n, c) => `Además, el grupo firma publicaciones con ${n} instituciones de ${c} países.`, seeNet: 'Ver la red de colaboraciones',
+  galEmpty: 'Todavía no hay fotos en la galería.', galEmptyTxt: 'Cualquier miembro del grupo puede añadirlas siguiendo la guía de edición.', close: 'Cerrar', prev: 'Anterior', next: 'Siguiente', photoBy: 'Foto'
+});
+/* ---------- citas (OpenAlex) ---------- */
+const CI = W.CITAS || { obras: {}, instituciones: [], autores: {} };
+const GAL = W.GALERIA || [];
+const normD = d => String(d || '').trim().toLowerCase().replace(/^https?:\/\/(dx\.)?doi\.org\//, '');
+const ciKey = b => b.doi ? 'doi:' + normD(b.doi) : 't:' + norm(b.t).replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+const ciOf = b => CI.obras[ciKey(b)] || null;
+const cites = b => { const o = ciOf(b); return o ? o[0] : null; };
+const hIndex = arr => { const s = arr.filter(x => x != null).sort((a, b) => b - a); let h = 0; while (h < s.length && s[h] >= h + 1) h++; return h; };
+const ciDate = () => CI.fecha ? new Date(CI.fecha + 'T12:00').toLocaleDateString(EN ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+const ctry = (() => { try { const dn = new Intl.DisplayNames([EN ? 'en' : 'es'], { type: 'region' }); return c => { try { return dn.of(c); } catch (e) { return c; } }; } catch (e) { return c => c; } })();
+const flag = c => /^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map(x => 0x1F1E6 + x.charCodeAt(0) - 65)) : '';
+/* red de colaboraciones: miembros (con publicaciones) e instituciones coautoras */
+function buildNet(maxInst = 36) {
+  const mem = MALL.map(m => ({ m, id: slug(m.nombre), pubs: 0, kind: m.antiguo ? 'old' : 'mem' })), pair = {}, mi = {}, iw = {};
+  B.forEach(b => { const who = mem.filter(x => signs(x.m, b.au)); who.forEach(x => x.pubs++);
+    for (let a = 0; a < who.length; a++) for (let c = a + 1; c < who.length; c++) { const k = who[a].id + '|' + who[c].id; pair[k] = (pair[k] || 0) + 1; }
+    const o = ciOf(b); if (!o) return; for (const j of o[1]) { iw[j] = (iw[j] || 0) + 1; for (const x of who) { const k = x.id + '|' + j; mi[k] = (mi[k] || 0) + 1; } } });
+  const nodes = mem.filter(x => x.pubs > 0);
+  const top = Object.keys(iw).map(Number).sort((a, b) => iw[b] - iw[a]).slice(0, maxInst).filter(j => iw[j] >= 3);
+  const inst = top.map(j => { const [n, c, t] = CI.instituciones[j] || ['?', '', '']; return { j, id: 'i' + j, name: n, c, t, pubs: iw[j], kind: c === 'ES' ? 'es' : 'intl' }; });
+  const byId = Object.fromEntries([...nodes, ...inst].map(n => [n.id, n]));
+  const links = [];
+  for (const [k, w] of Object.entries(pair)) { const [a, b] = k.split('|'); if (byId[a] && byId[b]) links.push({ source: a, target: b, w, kind: 'mm' }); }
+  for (const [k, w] of Object.entries(mi)) { const [a, j] = k.split('|'); if (byId[a] && byId['i' + j]) links.push({ source: a, target: 'i' + j, w, kind: 'mi' }); }
+  const allInst = Object.keys(iw).map(Number), countries = {};
+  allInst.forEach(j => { const c = (CI.instituciones[j] || [])[1]; if (c && c !== 'ES') countries[c] = (countries[c] || 0) + 1; else if (c === 'ES') countries.ES = (countries.ES || 0) + 1; });
+  return { nodes, inst, links, pairs: Object.keys(pair).length, nInst: allInst.length, countries, iw };
+}
 const PAIS_EN = { 'España': 'Spain', 'Portugal': 'Portugal', 'Marruecos': 'Morocco', 'Brasil': 'Brazil', 'Paraguay': 'Paraguay', 'Costa Rica': 'Costa Rica', 'México': 'Mexico', 'Ecuador': 'Ecuador', 'Chile': 'Chile', 'Argentina': 'Argentina', 'Colombia': 'Colombia', 'Sudáfrica': 'South Africa', 'Italia': 'Italy', 'Francia': 'France', 'Reino Unido': 'United Kingdom', 'Noruega': 'Norway' };
 const PUESTO_EN = { 'Catedrático de Universidad': 'Full Professor', 'Profesor Titular de Universidad': 'Associate Professor', 'Profesora Titular de Universidad': 'Associate Professor', 'Profesor Titular': 'Associate Professor', 'Profesor Contratado Doctor': 'Associate Professor (tenured)', 'Profesora Contratada Doctora': 'Associate Professor (tenured)', 'Profesora Ayudante Doctora': 'Assistant Professor', 'Profesor Ayudante Doctor': 'Assistant Professor', 'Profesora Permanente Laboral': 'Associate Professor', 'Investigador Ramón y Cajal': 'Ramón y Cajal Researcher', 'Investigadora Ramón y Cajal': 'Ramón y Cajal Researcher', 'Investigador contratado de proyecto': 'Project researcher', 'Investigadora contratada de proyecto': 'Project researcher', 'Investigadora predoctoral contratada de proyecto': 'PhD researcher (project contract)', 'Investigadora predoctoral': 'PhD researcher', 'Investigador predoctoral': 'PhD researcher', 'Coordinador del grupo': 'Group coordinator', 'Director del CIBC-UAM': 'Director of CIBC-UAM', 'Investigador de Atracción de Talento (Comunidad de Madrid)': 'Talent Attraction Researcher (Madrid Region)' };
 const tr = (o, f) => (EN && o && o[f + '_en']) ? o[f + '_en'] : (o ? o[f] : '');
-const puesto = m => { const p = m.puesto || ''; return EN ? p.split(' · ').map(x => PUESTO_EN[x] || x).join(' · ') : p; };
+const puesto = m => { if (EN && m.puesto_en) return m.puesto_en; const p = m.puesto || ''; return EN ? p.split(' · ').map(x => PUESTO_EN[x] || x).join(' · ') : p; };
 const pais = p => EN ? (PAIS_EN[p] || p) : p;
 const asset = p => !p ? '' : /^(https?:|data:|\/)/.test(p) ? p : ROOT + p;
 const lineById = id => L.find(l => l.id === id);
@@ -87,26 +144,29 @@ const avatar = m => m.foto ? `<img src="${esc(asset(m.foto))}" alt="" loading="l
 
 /* ---------- navegación y pie ---------- */
 const FILES = ['lineas', 'equipo', 'proyectos', 'mapa', 'publicaciones', 'tesis', 'novedades', 'contacto'];
+const NAV = FILES.map((f, i) => [f, S.nav[i]]);
+NAV.splice(5, 0, ['red', S.navRed]); if ((W.GALERIA || []).length) NAV.splice(8, 0, ['galeria', S.navGal]);
 const cur = { miembro: 'equipo', proyecto: 'proyectos' }[PAGE] || PAGE;
 const here = location.pathname.split('/').pop() || 'index.html';
 const otherHref = (EN ? '../' : 'en/') + here + location.search + location.hash;
 document.body.insertAdjacentHTML('afterbegin', `<a class="skip" href="#main">${EN ? 'Skip to content' : 'Saltar al contenido'}</a><header class="nav over" id="nav"><div class="wrap">
   <a class="brand" href="index.html"><span class="lg"><img src="${ROOT}img/logo.png" alt=""></span><span><b>TEG · UAM</b><small>${S.brandSub}</small></span></a>
   <button id="mbtn" aria-expanded="false" aria-controls="menu">${S.menu}</button>
-  <ul id="menu">${FILES.map((f, i) => `<li><a href="${f}.html"${f === cur ? ' aria-current="page"' : ''}>${S.nav[i]}</a></li>`).join('')}<li><a class="lang" href="${otherHref}" hreflang="${EN ? 'es' : 'en'}" title="${S.otherT}">${S.other}</a></li></ul>
+  <ul id="menu">${NAV.map(([f, t]) => `<li><a href="${f}.html"${f === cur ? ' aria-current="page"' : ''}>${t}</a></li>`).join('')}<li><a class="lang" href="${otherHref}" hreflang="${EN ? 'es' : 'en'}" title="${S.otherT}">${S.other}</a></li></ul>
 </div><i class="prog" id="prog"></i></header>`);
 $('main')?.setAttribute('id', 'main');
 document.body.insertAdjacentHTML('beforeend', `<footer><div class="cols">
   <div><div class="flogo"><img src="${ROOT}img/logo.png" alt="TEG · Terrestrial Ecology Group, Universidad Autónoma de Madrid"></div><p>${S.footTxt}</p></div>
-  <div><h4>${S.explore}</h4><p>${FILES.slice(0, 5).map((f, i) => `<a href="${f}.html">${S.nav[i]}</a>`).join('<br>')}</p></div>
-  <div><h4>&nbsp;</h4><p>${FILES.slice(5).map((f, i) => `<a href="${f}.html">${S.nav[i + 5]}</a>`).join('<br>')}<br><a href="${otherHref}">${S.otherT}</a></p></div>
-  <div><h4>${S.where}</h4><p>${EN ? 'Biology Building, C/ Darwin 2<br>Cantoblanco Campus, 28049 Madrid, Spain' : 'Edificio de Biología, C/ Darwin 2<br>Campus de Cantoblanco, 28049 Madrid'}</p><p class="mono coords">40.545° N · 3.692° W</p></div>
+  <div><h2 class="fh">${S.explore}</h2><p>${NAV.slice(0, 5).map(([f, t]) => `<a href="${f}.html">${t}</a>`).join('<br>')}</p></div>
+  <div><p class="fh" aria-hidden="true">&nbsp;</p><p>${NAV.slice(5).map(([f, t]) => `<a href="${f}.html">${t}</a>`).join('<br>')}<br><a href="${otherHref}">${S.otherT}</a></p></div>
+  <div><h2 class="fh">${S.where}</h2><p>${EN ? 'Biology Building, C/ Darwin 2<br>Cantoblanco Campus, 28049 Madrid, Spain' : 'Edificio de Biología, C/ Darwin 2<br>Campus de Cantoblanco, 28049 Madrid'}</p><p class="mono coords">40.545° N · 3.692° W</p></div>
 </div><div class="base2"><span>© ${NOWY} TEG-UAM · Universidad Autónoma de Madrid</span><span>${S.staticSite}${CFG.goatcounter && CFG.estadisticas_publicas ? ` · <a href="https://${esc(CFG.goatcounter)}.goatcounter.com">${S.stats}</a>` : ''}</span></div></footer><div class="toast" id="toast" role="status"></div>`);
 if (CFG.goatcounter) { const g = document.createElement('script'); g.async = true; g.src = 'https://gc.zgo.at/count.js'; g.dataset.goatcounter = `https://${CFG.goatcounter}.goatcounter.com/count`; document.head.appendChild(g); }
 const nav = $('#nav'), prog = $('#prog');
 const onScroll = () => { const y = scrollY, h = document.documentElement.scrollHeight - innerHeight; prog.style.width = (h > 0 ? y / h * 100 : 0) + '%'; nav.classList.toggle('over', y < 30); };
 addEventListener('scroll', onScroll, { passive: true }); onScroll();
 $('#mbtn').addEventListener('click', () => { const o = $('#menu').classList.toggle('open'); $('#mbtn').setAttribute('aria-expanded', o); if (o) nav.classList.remove('over'); else onScroll(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#menu').classList.contains('open')) { $('#mbtn').click(); $('#mbtn').focus(); } });
 const rvo = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rvo.unobserve(e.target); } }), { threshold: .12 });
 const reveal = () => $$('.rv:not(.in)').forEach(el => rvo.observe(el));
 const toast = msg => { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 2200); };
@@ -121,7 +181,7 @@ const PTS = M.map((m, i) => { const ls = mLines(m); let x = 0, y = 0; ls.forEach
 
 /* ---------- publicaciones ---------- */
 const pubHref = b => b.doi ? 'https://doi.org/' + b.doi : (b.url || 'https://scholar.google.com/scholar?q=' + encodeURIComponent(b.t));
-const pubHTML = (b, i) => `<div class="pub"><span class="y mono">${b.a}</span><div><a class="t" href="${esc(pubHref(b))}">${esc(b.t)}</a><div class="a">${b.au ? esc(b.au) + '. ' : ''}<em>${esc(b.r)}</em>${b.v ? ' ' + esc(b.v) : ''}${b.q ? `<span class="badge q">${esc(b.q)}</span>` : ''}${b.oa ? '<span class="badge oa">Open Access</span>' : ''}${b.tipo !== 'art' ? `<span class="badge k ${esc(b.tipo)}">${S.tipoPub[b.tipo] || ''}</span>` : ''}${b.auto ? `<span class="badge k">${S.autoAdded}</span>` : ''}<button class="cite" data-c="${i}">${S.copy}</button></div></div></div>`;
+const pubHTML = (b, i) => `<div class="pub"><span class="y mono">${b.a}</span><div><a class="t" href="${esc(pubHref(b))}">${esc(b.t)}</a><div class="a">${b.au ? esc(b.au) + '. ' : ''}<em>${esc(b.r)}</em>${b.v ? ' ' + esc(b.v) : ''}${b.q ? `<span class="badge q">${esc(b.q)}</span>` : ''}${b.oa ? '<span class="badge oa">Open Access</span>' : ''}${b.tipo !== 'art' ? `<span class="badge k ${esc(b.tipo)}">${S.tipoPub[b.tipo] || ''}</span>` : ''}${b.auto ? `<span class="badge k">${S.autoAdded}</span>` : ''}${cites(b) ? `<span class="badge cit" title="${S.citT}">${S.nCit(cites(b))}</span>` : ''}<button class="cite" data-c="${i}">${S.copy}</button></div></div></div>`;
 const citeText = b => `${b.au} (${b.a}). ${b.t}. ${b.r}${b.v ? ', ' + b.v : ''}.${b.doi ? ' https://doi.org/' + b.doi : (b.url ? ' ' + b.url : '')}`;
 document.addEventListener('click', e => { const c = e.target.closest('.cite'); if (!c) return; navigator.clipboard?.writeText(citeText(B[+c.dataset.c])).then(() => toast(S.copied), () => toast(S.copyFail)); });
 const yearSeries = () => {
@@ -210,6 +270,50 @@ inicio() {
   const f = P.filter(p => p.tipo === 'life' && active(p)).sort((a, b) => b.ini - a.ini)[0];
   if (f) $('#feat').innerHTML = `<div class="plate">${plate(f.linea, 11)}</div><div><span class="mono mute">${S.featured} · ${f.ini}–${f.fin}</span><h2 style="margin:10px 0 14px">${esc(tr(f, 't'))}</h2><p class="mute">${esc(tr(f, 'resumen') || f.fin_)}</p><div class="btns"><a class="btn" href="proyecto.html?id=${pid(f)}">${S.seeProj}</a><a class="btn ghost" href="proyectos.html">${S.allProj}</a></div></div>`;
   $('#lastnews').innerHTML = N.slice(0, 3).map((n, i) => newsCard(n, i)).join('');
+  funders();
+  const nfig = $('#hnet'); if (nfig && window.d3) { const net = buildNet(24); if (net.nInst) { drawNet(nfig, net, { small: true }); $('#hnetk').innerHTML = [[net.nInst, S.netInst], [Object.keys(net.countries).length, S.netCountries], [net.pairs, S.netPairs]].map(s => `<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join(''); } else nfig.closest('section')?.remove(); }
+},
+
+red() {
+  pageArt('biogeografia', 21);
+  const net = buildNet(), d = ciDate();
+  kpis('#kp', [[net.nodes.filter(n => n.kind === 'mem').length, S.netMembers], [net.pairs, S.netPairs], [net.nInst, S.netInst], [Object.keys(net.countries).length, S.netCountries]]);
+  const fig = $('#net'); let inst = true, line = '';
+  $('#rchips').innerHTML = [['i', S.withInst], ['g', S.onlyGroup]].map(c => `<button class="chip" data-v="${c[0]}" aria-pressed="${c[0] === 'i'}">${c[1]}</button>`).join('') + L.map(l => `<button class="chip" data-l="${l.id}" aria-pressed="false">${esc(tr(l, 'corto'))}</button>`).join('');
+  const redraw = () => drawNet(fig, net, { inst, line });
+  $('#rchips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return;
+    if (b.dataset.v) { inst = b.dataset.v === 'i'; $$('#rchips [data-v]').forEach(x => x.setAttribute('aria-pressed', x === b)); }
+    else { line = line === b.dataset.l ? '' : b.dataset.l; $$('#rchips [data-l]').forEach(x => x.setAttribute('aria-pressed', x.dataset.l === line)); }
+    redraw(); });
+  if (!net.nInst) { $('#rnote').textContent = S.netEmpty; inst = false; }
+  else $('#rnote').textContent = S.netNote(d);
+  redraw(); let t; new ResizeObserver(() => { clearTimeout(t); t = setTimeout(redraw, 200); }).observe(fig);
+  const top = Object.keys(net.iw).map(Number).sort((a, b) => net.iw[b] - net.iw[a]).slice(0, 15);
+  $('#ilist').innerHTML = top.map(j => { const [n, c] = CI.instituciones[j]; return `<li><span>${esc(n)}</span><small>${flag(c)} ${esc(ctry(c))} · ${S.works(net.iw[j])}</small></li>`; }).join('');
+  const cs = Object.entries(net.countries).sort((a, b) => b[1] - a[1]), mx = Math.max(1, ...cs.map(c => c[1]));
+  $('#countries').innerHTML = cs.map(([c, n]) => `<div><span>${flag(c)} ${esc(ctry(c))}</span><i style="width:${Math.max(2, n / mx * 100)}%"></i><b>${n}</b></div>`).join('');
+},
+
+galeria() {
+  pageArt('pastizales', 9);
+  const g = $('#gal'), lines = [...new Set(GAL.map(x => x.linea).filter(Boolean))];
+  if (!GAL.length) { g.innerHTML = `<div class="empty"><h2 class="h3">${S.galEmpty}</h2><p class="mute">${S.galEmptyTxt}</p></div>`; return; }
+  kpis('#kp', [[GAL.length, EN ? 'photos' : 'fotos'], [new Set(GAL.map(x => x.autor)).size, EN ? 'photographers' : 'autores']]);
+  let f = '';
+  if (lines.length > 1) { $('#gchips').innerHTML = [['', S.all]].concat(lines.map(id => [id, lShort(id)])).map(c => `<button class="chip" data-l="${c[0]}" aria-pressed="${c[0] === f}">${esc(c[1])}</button>`).join('');
+    $('#gchips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; f = b.dataset.l; $$('#gchips .chip').forEach(x => x.setAttribute('aria-pressed', x === b)); draw(); }); }
+  let list = [];
+  const cap = x => [tr(x, 'pie'), x.lugar, x.fecha].filter(Boolean).map(esc).join(' · ');
+  const draw = () => { list = GAL.filter(x => !f || x.linea === f);
+    g.innerHTML = list.map((x, i) => `<figure><button class="gimg" data-i="${i}" aria-label="${esc(tr(x, 'pie') || S.photoBy)}"><img src="${esc(asset(x.img))}" alt="${esc(tr(x, 'pie') || '')}" loading="lazy"></button><figcaption>${cap(x)}<small>© ${esc(x.autor || 'TEG-UAM')}</small></figcaption></figure>`).join(''); };
+  draw();
+  const dlg = $('#lightbox'); let cur = 0, opener = null;
+  const show = i => { cur = (i + list.length) % list.length; const x = list[cur]; $('#lbimg').src = asset(x.img); $('#lbimg').alt = tr(x, 'pie') || ''; $('#lbcap').innerHTML = `${cap(x)} <small>© ${esc(x.autor || 'TEG-UAM')} · ${cur + 1}/${list.length}</small>`; };
+  g.addEventListener('click', e => { const b = e.target.closest('.gimg'); if (!b) return; opener = b; show(+b.dataset.i); dlg.showModal(); $('#lbclose').focus(); });
+  $('#lbprev').onclick = () => show(cur - 1); $('#lbnext').onclick = () => show(cur + 1); $('#lbclose').onclick = () => dlg.close();
+  dlg.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(cur - 1); if (e.key === 'ArrowRight') show(cur + 1); });
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => opener?.focus());
 },
 
 lineas() {
@@ -223,9 +327,9 @@ lineas() {
     return `<section class="line rv" id="${l.id}"><div class="plate">${plateOrImg(l, i + 1)}</div><div>
       <span class="mono mute">${S.lineOf(i + 1, L.length)}</span><h2 style="margin-top:8px">${esc(tr(l, 'nombre'))}</h2><p class="lede">${esc(tr(l, 'texto'))}</p>
       <div class="tags">${(tr(l, 'claves') || []).map(k => `<span class="tag">${esc(k)}</span>`).join('')}</div>
-      <h4>${S.who} (${ppl.length})</h4><div class="ppl">${ppl.map(p => `<a class="tag" href="miembro.html?id=${p.id}">${esc(p.m.nombre.split(' ').slice(0, 2).join(' '))}</a>`).join('')}</div>
-      ${pr.length ? `<h4>${S.activeP} (${pr.length})</h4><ul class="plist">${pr.map(p => `<li><a href="proyecto.html?id=${pid(p)}">${esc(tr(p, 't'))}</a><small>${p.ini}–${p.fin} · ${esc(p.fin_)}</small></li>`).join('')}</ul>` : ''}
-      ${pubs.length ? `<h4>${S.recentPubs(pubs.length)}</h4><ul class="plist">${pubs.slice(0, 4).map(b => `<li><a href="${esc(pubHref(b))}">${esc(b.t)}</a><small>${b.a} · ${esc(b.r)}</small></li>`).join('')}</ul>` : ''}
+      <h3>${S.who} (${ppl.length})</h3><div class="ppl">${ppl.map(p => `<a class="tag" href="miembro.html?id=${p.id}">${esc(p.m.nombre.split(' ').slice(0, 2).join(' '))}</a>`).join('')}</div>
+      ${pr.length ? `<h3>${S.activeP} (${pr.length})</h3><ul class="plist">${pr.map(p => `<li><a href="proyecto.html?id=${pid(p)}">${esc(tr(p, 't'))}</a><small>${p.ini}–${p.fin} · ${esc(p.fin_)}</small></li>`).join('')}</ul>` : ''}
+      ${pubs.length ? `<h3>${S.recentPubs(pubs.length)}</h3><ul class="plist">${pubs.slice(0, 4).map(b => `<li><a href="${esc(pubHref(b))}">${esc(b.t)}</a><small>${b.a} · ${esc(b.r)}</small></li>`).join('')}</ul>` : ''}
       ${where.length ? `<p class="note" style="margin-top:16px">${S.workIn} ${esc([...new Set(where.map(g => pais(g.pais)))].join(', '))} · <a href="mapa.html?linea=${l.id}">${S.onMap}</a></p>` : ''}
     </div></section>`; }).join('');
 },
@@ -274,26 +378,28 @@ miembro() {
   const pr = P.filter(x => signs(m, x.ip)).sort((a, b) => b.fin - a.fin);
   const own = T.filter(t => norm(m.nombre).includes(norm(t.autor)) || norm(t.autor).includes(norm(m.nombre)));
   const th = T.filter(t => signs(m, t.dir) && !own.includes(t)).sort((a, b) => (a.estado === b.estado ? 0 : a.estado === 'curso' ? -1 : 1));
-  kpis('#kp', [[pubs.length, S.pubsWeb], [pr.length, S.projIP], [th.length, S.thDir]]);
+  const oa = CI.autores[m.nombre];
+  kpis('#kp', [[pubs.length, S.pubsWeb], [pr.length, S.projIP], [th.length, S.thDir]].concat(oa && oa.h != null ? [[oa.h, S.kpiH]] : []));
   const bio = tr(m, 'bio'); if (bio) $('#mrole').insertAdjacentHTML('afterend', `<p class="lede" style="font-size:16.5px;max-width:70ch;margin-top:14px;color:#C9CFBD">${esc(bio)}</p>`);
   const em = email(m);
   const links = [[m.orcid && 'https://orcid.org/' + m.orcid, 'ORCID'], [m.uam, S.uamProfile], [m.scholar, 'Google Scholar'], [m.rg, 'ResearchGate'], [m.web, S.personalWeb]].filter(x => x[0]);
   const thItem = t => `<li>${esc(t.autor)}: ${esc(t.t)}<small>${t.estado === 'leida' ? S.read : S.inProg + ' · ' + S.expected} ${esc(t.fecha || S.nd)} · ${esc(t.prog)} · ${S.dir}: ${esc(t.dir)}</small></li>`;
   $('#mbody').innerHTML = `<div class="cols2">
-    <div><h3>${S.linesH}</h3><div class="tags">${ls.map(id => `<a class="tag" href="lineas.html#${id}">${esc(lName(id))}</a>`).join('') || `<span class="mute">${S.pending}</span>`}</div>
-      ${m.antiguo ? '' : `<h3 style="margin-top:24px">${S.contact}</h3><dl class="ficha">${em ? `<dt>${S.email}</dt><dd><a href="mailto:${esc(em)}">${esc(em)}</a></dd>` : ''}${m.despacho ? `<dt>${S.office}</dt><dd>${esc(EN ? m.despacho.replace('Edificio de Biología', 'Biology Building') : m.despacho)}</dd>` : ''}${m.tel ? `<dt>${S.phone}</dt><dd>${esc(m.tel)}</dd>` : ''}${m.orcid ? `<dt>ORCID</dt><dd><a href="https://orcid.org/${esc(m.orcid)}">${esc(m.orcid)}</a></dd>` : ''}</dl>${!em && !m.despacho ? `<p class="mute">${S.noContact}</p>` : ''}`}
+    <div><h2 class="h3">${S.linesH}</h2><div class="tags">${ls.map(id => `<a class="tag" href="lineas.html#${id}">${esc(lName(id))}</a>`).join('') || `<span class="mute">${S.pending}</span>`}</div>
+      ${m.antiguo ? '' : `<h2 class="h3" style="margin-top:24px">${S.contact}</h2><dl class="ficha">${em ? `<dt>${S.email}</dt><dd><a href="mailto:${esc(em)}">${esc(em)}</a></dd>` : ''}${m.despacho ? `<dt>${S.office}</dt><dd>${esc(EN ? m.despacho.replace('Edificio de Biología', 'Biology Building') : m.despacho)}</dd>` : ''}${m.tel ? `<dt>${S.phone}</dt><dd>${esc(m.tel)}</dd>` : ''}${m.orcid ? `<dt>ORCID</dt><dd><a href="https://orcid.org/${esc(m.orcid)}">${esc(m.orcid)}</a></dd>` : ''}</dl>${!em && !m.despacho ? `<p class="mute">${S.noContact}</p>` : ''}`}
       ${links.length ? `<div class="tags">${links.map(l => `<a class="tag" href="${esc(l[0])}">${l[1]} ↗</a>`).join('')}</div>` : ''}
-      ${own.length ? `<h3 style="margin-top:24px">${S.ownTh}</h3><ul class="plist">${own.map(thItem).join('')}</ul>` : ''}
-      ${pr.length ? `<h3 style="margin-top:24px">${S.projects}</h3><ul class="plist">${pr.map(x => `<li><a href="proyecto.html?id=${pid(x)}">${esc(tr(x, 't'))}</a><small>${x.ini}–${x.fin} · ${esc(x.fin_)}${active(x) ? ' · ' + S.ongoing : ''}</small></li>`).join('')}</ul>` : ''}
-      ${th.length ? `<h3 style="margin-top:24px">${S.dirTh(th.length)}</h3><ul class="plist">${th.map(thItem).join('')}</ul>` : ''}
+      ${own.length ? `<h2 class="h3" style="margin-top:24px">${S.ownTh}</h2><ul class="plist">${own.map(thItem).join('')}</ul>` : ''}
+      ${pr.length ? `<h2 class="h3" style="margin-top:24px">${S.projects}</h2><ul class="plist">${pr.map(x => `<li><a href="proyecto.html?id=${pid(x)}">${esc(tr(x, 't'))}</a><small>${x.ini}–${x.fin} · ${esc(x.fin_)}${active(x) ? ' · ' + S.ongoing : ''}</small></li>`).join('')}</ul>` : ''}
+      ${th.length ? `<h2 class="h3" style="margin-top:24px">${S.dirTh(th.length)}</h2><ul class="plist">${th.map(thItem).join('')}</ul>` : ''}
     </div>
-    <div><h3>${S.pubs(pubs.length)}</h3><div id="mpubs">${pubs.length ? pubs.slice(0, 12).map(x => pubHTML(x.b, x.i)).join('') : `<p class="mute">${S.noPubs}</p>`}</div>${pubs.length > 12 ? `<button class="btn ghost" id="mmore" style="color:var(--text);margin-top:16px">${S.seeAll(pubs.length)}</button>` : ''}
+    <div>${oa ? `<h2 class="h3">${S.impact}</h2><dl class="ficha"><dt>${S.hIdx}</dt><dd>${oa.h ?? '–'}</dd><dt>${S.citsAll}</dt><dd>${(oa.citas || 0).toLocaleString(EN ? 'en' : 'es')}</dd><dt>${S.worksAll}</dt><dd>${oa.trabajos || 0}</dd></dl><p class="note">${S.impM(ciDate())} <a href="https://openalex.org/authors/${esc(oa.oa)}">${S.oaProfile} ↗</a></p><h2 class="h3" style="margin-top:24px">` : '<h2 class="h3">'}${S.pubs(pubs.length)}</h2><div id="mpubs">${pubs.length ? pubs.slice(0, 12).map(x => pubHTML(x.b, x.i)).join('') : `<p class="mute">${S.noPubs}</p>`}</div>${pubs.length > 12 ? `<button class="btn ghost" id="mmore" style="color:var(--text);margin-top:16px">${S.seeAll(pubs.length)}</button>` : ''}
       <p class="note" style="margin-top:14px">${S.autoLink}</p></div></div>`;
   $('#mmore')?.addEventListener('click', e => { $('#mpubs').innerHTML = pubs.map(x => pubHTML(x.b, x.i)).join(''); e.target.remove(); });
 },
 
 proyectos() {
   pageArt('evaluacion', 8);
+  funders();
   kpis('#kp', [[P.filter(active).length, S.inCourse], [P.filter(p => p.tipo === 'life').length, S.lifeP], [P.filter(p => p.tipo === 'internacional' && active(p)).length, S.intlA], [P.filter(p => p.tipo === 'contrato' && active(p)).length, S.contrA]]);
   let pF = 'act', q = '';
   $('#pchips').innerHTML = [['act', S.onGoing], ['all', S.allM]].concat(Object.entries(S.types)).concat(L.map(l => ['l:' + l.id, tr(l, 'corto')])).map(c => `<button class="chip" data-v="${c[0]}" aria-pressed="${c[0] === pF}">${esc(c[1])}</button>`).join('');
@@ -338,7 +444,7 @@ mapa() {
   function list() {
     const by = {}; G.forEach((g, i) => { if (vis(g)) (by[g.pais] = by[g.pais] || []).push(i); });
     const order = Object.keys(by).sort((a, b) => (a === 'España' ? -1 : b === 'España' ? 1 : pais(a).localeCompare(pais(b), EN ? 'en' : 'es')));
-    $('#places').innerHTML = order.map(c => `<section><h4>${esc(pais(c))}</h4>${by[c].map(i => `<button data-i="${i}" class="${i === sel ? 'on' : ''}">${esc(tr(G[i], 'n'))}<small>${esc(tr(G[i], 'txt'))}</small></button>`).join('')}</section>`).join('');
+    $('#places').innerHTML = order.map(c => `<section><h3>${esc(pais(c))}</h3>${by[c].map(i => `<button data-i="${i}" class="${i === sel ? 'on' : ''}">${esc(tr(G[i], 'n'))}<small>${esc(tr(G[i], 'txt'))}</small></button>`).join('')}</section>`).join('');
   }
   let geo = null; const d3 = W.d3;
   function draw() {
@@ -393,15 +499,21 @@ publicaciones() {
   const ro = new ResizeObserver(() => chart(false)); ro.observe(fig);
   new IntersectionObserver((es, o) => { if (es[0].isIntersecting && !seen) { seen = true; chart(!RM); o.disconnect(); } }, { threshold: .3 }).observe(fig);
   $('#chartnote').textContent = S.pubNote(NOWY, ser.filter(s => s.n == null).map(s => s.y));
+  const withC = B.filter(b => cites(b) != null);
+  if (withC.length && $('#impact')) {
+    const tot = withC.reduce((s, b) => s + cites(b), 0), best = withC.slice().sort((a, b) => cites(b) - cites(a))[0];
+    $('#impact').innerHTML = `<div><b>${tot.toLocaleString(EN ? 'en' : 'es')}</b><span>${S.totCit}</span></div><div><b>${hIndex(withC.map(cites))}</b><span>${S.hGroup}</span></div><div><b>${Math.round(withC.filter(b => cites(b) > 0).length / withC.length * 100)} %</b><span>${S.citedPct}</span></div><div class="mc"><span class="mono mute">${S.mostCited} · ${S.nCit(cites(best))}</span><a href="${esc(pubHref(best))}">${esc(best.t)}</a><small>${esc((best.au || '').length > 70 ? best.au.slice(0, 68).replace(/[,;][^,;]*$/, '') + ' et al.' : best.au)} (${best.a}) · <em>${esc(best.r)}</em></small></div>`;
+    $('#impnote').textContent = S.impNote(ciDate());
+  } else $('#impsec')?.remove();
   const years = [...new Set(B.map(b => b.a))].sort((a, b) => b - a);
   $('#by').innerHTML = `<option value="">${S.allY}</option>` + years.map(y => `<option>${y}</option>`).join('');
   let shown = 15;
   const draw = () => { const q = norm($('#bq').value), y = $('#by').value, t = $('#bt').value, oa = $('#boa').checked;
-    const list = B.map((b, i) => ({ b, i })).filter(({ b }) => (!y || String(b.a) === y) && (!t || b.tipo === t) && (!oa || b.oa) && (!q || norm([b.au, b.t, b.r].join(' ')).includes(q))).sort((a, b) => b.b.a - a.b.a);
+    const list = B.map((b, i) => ({ b, i })).filter(({ b }) => (!y || String(b.a) === y) && (!t || b.tipo === t) && (!oa || b.oa) && (!q || norm([b.au, b.t, b.r].join(' ')).includes(q))).sort($('#bs')?.value === 'c' ? (a, b) => (cites(b.b) ?? -1) - (cites(a.b) ?? -1) || b.b.a - a.b.a : (a, b) => b.b.a - a.b.a);
     $('#bcount').textContent = S.nPubs(list.length);
     $('#pubs').innerHTML = list.slice(0, shown).map(x => pubHTML(x.b, x.i)).join('') || `<p class="empty">${S.noPub}</p>`;
     $('#bmore').style.display = list.length > shown ? '' : 'none'; };
-  ['#bq', '#by', '#bt', '#boa'].forEach(id => $(id).addEventListener('input', () => { shown = 15; draw(); }));
+  ['#bq', '#by', '#bt', '#boa', '#bs'].forEach(id => $(id)?.addEventListener('input', () => { shown = 15; draw(); }));
   $('#bmore').addEventListener('click', () => { shown += 20; draw(); });
   draw();
 },
@@ -448,6 +560,69 @@ contacto() {
 
 function newsCard(n, i) {
   return `<article><div class="plate">${n.img ? `<img src="${esc(asset(n.img))}" alt="" loading="lazy">` : plate(KINDS[i % KINDS.length], 40 + i)}</div><div class="in"><span class="mono">${esc(n.fecha)} · ${esc(n.tipo)}</span><h3 style="margin-top:6px">${n.url ? `<a href="${esc(n.url)}" style="color:inherit">${esc(tr(n, 't'))}</a>` : esc(tr(n, 't'))}</h3><p>${esc(tr(n, 'txt'))}</p></div></article>`;
+}
+
+/* ---------- financiadores y colaboradores ---------- */
+function funders() {
+  const el = $('#funders'); if (!el) return;
+  const F = (W.FINANCIADORES || []).map(f => { let n = 0; try { n = f.buscar ? P.filter(p => new RegExp(f.buscar, 'i').test(p.fin_ || '')).length : 0; } catch (e) { } return { f, n }; })
+    .sort((a, b) => (a.f.tipo === 'empresa') - (b.f.tipo === 'empresa') || b.n - a.n);
+  const tile = ({ f, n }) => { const inner = `${f.logo ? `<img src="${esc(asset(f.logo))}" alt="${esc(tr(f, 'n'))}" loading="lazy">` : `<b>${esc(tr(f, 'n'))}</b>`}<span class="mono">${f.tipo === 'empresa' ? S.transfer + (n ? ' · ' : '') : ''}${n ? S.nProjF(n) : ''}</span>`;
+    return f.url ? `<a class="fund" href="${esc(f.url)}">${inner}</a>` : `<div class="fund">${inner}</div>`; };
+  el.innerHTML = F.map(tile).join('');
+  const C = W.COLABORADORES || [], cl = $('#collabs');
+  if (cl) cl.innerHTML = C.map(c => { const inner = `<b>${esc(tr(c, 'n'))}</b><span class="mono">${esc(pais(c.pais || ''))}</span>`; return c.url ? `<a class="fund col" href="${esc(c.url)}">${inner}</a>` : `<div class="fund col">${inner}</div>`; }).join('');
+  const net = buildNet(), nc = Object.keys(net.countries).length;
+  if ($('#collabtxt') && net.nInst) $('#collabtxt').innerHTML = `${S.collabsTxt(net.nInst, nc)} <a href="red.html">${S.seeNet} →</a>`;
+}
+/* ---------- dibujo de la red (d3) ---------- */
+function drawNet(fig, net, opts = {}) {
+  const svg = d3.select(fig).select('svg'), tip = fig.querySelector('.nettip');
+  const Wd = fig.clientWidth, H = fig.clientHeight;
+  svg.attr('viewBox', `0 0 ${Wd} ${H}`).selectAll('*').remove();
+  const showInst = opts.inst !== false, line = opts.line || '';
+  let nodes = [...net.nodes, ...(showInst ? net.inst : [])].map(n => ({ ...n })), ids = new Set(nodes.map(n => n.id));
+  const links = net.links.filter(l => ids.has(l.source) && ids.has(l.target)).map(l => ({ ...l }));
+  const deg = new Set(links.flatMap(l => [l.source, l.target])); nodes = nodes.filter(n => deg.has(n.id));
+  const topI = new Set(nodes.filter(n => !(n.kind === 'mem' || n.kind === 'old')).sort((a, b) => b.pubs - a.pubs).slice(0, opts.small ? 0 : 7).map(n => n.id));
+  const r = n => n.kind === 'mem' || n.kind === 'old' ? 4 + Math.sqrt(n.pubs) * 1.7 : 3 + Math.sqrt(n.pubs) * 1.4;
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(l => l.kind === 'mm' ? 60 : 130).strength(l => l.kind === 'mm' ? Math.min(.9, .12 + l.w * .06) : .04))
+    .force('charge', d3.forceManyBody().strength(n => n.kind === 'mem' || n.kind === 'old' ? -260 : -110))
+    .force('x', d3.forceX(Wd / 2).strength(.04)).force('y', d3.forceY(H / 2).strength(.06 * Wd / H))
+    .force('collide', d3.forceCollide(n => r(n) + 3)).stop();
+  for (let i = 0; i < 320; i++) sim.tick();
+  // encajar en el recuadro
+  const q = (a, f) => { const s = a.slice().sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.max(0, Math.round(f * (s.length - 1))))]; };
+  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y), x0 = q(xs, .03), x1 = q(xs, .97), y0 = q(ys, .03), y1 = q(ys, .97);
+  const k = Math.min((Wd - 90) / Math.max(1, x1 - x0), (H - 70) / Math.max(1, y1 - y0), 2), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  nodes.forEach(n => { n.x = Math.max(18, Math.min(Wd - 18, Wd / 2 + (n.x - cx) * k)); n.y = Math.max(18, Math.min(H - 18, H / 2 + (n.y - cy) * k)); });
+  const col = n => ({ mem: 'var(--olive)', old: 'var(--mute)', es: 'var(--straw)', intl: 'var(--red)' }[n.kind]);
+  const gl = svg.append('g'), gn = svg.append('g');
+  const L2 = gl.selectAll('line').data(links).join('line').attr('stroke', l => l.kind === 'mm' ? 'var(--olive)' : 'var(--ochre)')
+    .attr('stroke-opacity', l => l.kind === 'mm' ? .6 : opts.small ? .09 : .16).attr('stroke-width', l => l.kind === 'mm' ? Math.min(6, .7 + Math.sqrt(l.w) * .9) : Math.min(3, .4 + Math.sqrt(l.w) * .35));
+  const isM = n => n.kind === 'mem' || n.kind === 'old';
+  const N2 = gn.selectAll('g').data(nodes).join(enter => { const g = enter.append('g').attr('class', 'nn');
+    g.each(function (n) { const s = d3.select(this);
+      const a = isM(n) ? s.append('a').attr('href', 'miembro.html?id=' + n.id).attr('aria-label', `${n.m.nombre}: ${S.pubsN(n.pubs)}`) : s.append('g').attr('tabindex', 0).attr('role', 'img').attr('aria-label', `${n.name} (${ctry(n.c)}): ${S.works(n.pubs)}`);
+      if (isM(n)) a.append('circle').attr('r', r(n)).attr('fill', col(n)).attr('stroke', 'var(--paper)').attr('stroke-width', 1.5);
+      else a.append('rect').attr('x', -r(n)).attr('y', -r(n)).attr('width', r(n) * 2).attr('height', r(n) * 2).attr('rx', 2).attr('transform', 'rotate(45)').attr('fill', col(n)).attr('stroke', 'var(--olive)').attr('stroke-width', 1);
+      const lab = isM(n) ? (!opts.small && n.pubs >= 14 ? n.m.nombre[0] + '. ' + ((n.m.firma || '').split('|')[0].split(',')[0].trim() || n.m.nombre.split(' ')[1]) : '') : (topI.has(n.id) ? (n.name.length > 30 ? n.name.slice(0, 29) + '…' : n.name) : '');
+      if (lab) { const lf = n.x > Wd * .68; a.append('text').text(lab).attr('x', lf ? -(r(n) + 4) : r(n) + 4).attr('y', 4).attr('text-anchor', lf ? 'end' : 'start').attr('class', isM(n) ? 'nl' : 'nl inst'); } });
+    return g; });
+  const pos = () => { L2.attr('x1', l => l.source.x).attr('y1', l => l.source.y).attr('x2', l => l.target.x).attr('y2', l => l.target.y); N2.attr('transform', n => `translate(${n.x},${n.y})`); };
+  pos();
+  const nb = n => new Set([n.id, ...links.filter(l => l.source.id === n.id || l.target.id === n.id).flatMap(l => [l.source.id, l.target.id])]);
+  const focus = (n, ev) => { const s = nb(n); N2.classed('dim', d => !s.has(d.id)); L2.classed('dim', l => l.source.id !== n.id && l.target.id !== n.id);
+    const ws = links.filter(l => l.source.id === n.id || l.target.id === n.id).sort((a, b) => b.w - a.w).slice(0, 4).map(l => { const o = l.source.id === n.id ? l.target : l.source; return `${esc(isM(o) ? o.m.nombre : o.name)} · ${l.w}`; });
+    tip.innerHTML = `<b>${esc(isM(n) ? n.m.nombre : n.name)}</b><span>${isM(n) ? S.pubsN(n.pubs) : flag(n.c) + ' ' + esc(ctry(n.c)) + ' · ' + S.works(n.pubs)}</span>${ws.length ? `<small>${ws.join('<br>')}</small>` : ''}`;
+    tip.hidden = false; const bx = fig.getBoundingClientRect(); const x = n.x / Wd * bx.width, y = n.y / H * bx.height; tip.style.left = Math.min(bx.width - 250, x + 14) + 'px'; tip.style.top = Math.max(0, y - 10) + 'px'; };
+  const blur = () => { N2.classed('dim', false); L2.classed('dim', false); tip.hidden = true; };
+  N2.on('mouseenter focusin', (ev, n) => focus(n, ev)).on('mouseleave focusout', blur);
+  if (line) N2.classed('dim', n => !(isM(n) && mLines(n.m).includes(line)));
+  N2.call(d3.drag().on('start', (ev, n) => { sim.alphaTarget(.2).restart(); n.fx = n.x; n.fy = n.y; }).on('drag', (ev, n) => { n.fx = ev.x; n.fy = ev.y; }).on('end', (ev, n) => { sim.alphaTarget(0); n.fx = n.fy = null; }));
+  sim.on('tick', pos);
+  if (!RM) sim.alpha(.05).restart();
 }
 
 /* ---------- TopoJSON → GeoJSON (mínimo, para el mapa) ---------- */

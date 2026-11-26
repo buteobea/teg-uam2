@@ -1,0 +1,94 @@
+# Comprueba datos.js y publica la web.
+# · En cada cambio: si datos.js tiene un error (una coma que falta, un año entre comillas…),
+#   el cambio se marca con una ✗ roja, se indica la línea exacta y la web NO se actualiza:
+#   sigue publicada la última versión correcta.
+# · Si todo está bien, publica la web en GitHub Pages (reduce las fotos grandes de la galería
+#   y genera el mapa del sitio para Google).
+# Requisito (una sola vez): Settings → Pages → Build and deployment → Source: «GitHub Actions».
+name: Comprobar y publicar
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Actualizar publicaciones"]
+    types: [completed]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Comprobar datos.js
+        run: node herramientas/validar.mjs
+  publicar:
+    needs: comprobar
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: ¿Está GitHub Pages configurado para publicar desde Actions?
+        id: modo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          m=$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null || echo "?")
+          echo "modo=$m" >> "$GITHUB_OUTPUT"
+          if [ "$m" != "workflow" ]; then
+            echo "::notice::La web se sigue publicando directamente desde la rama main (sin la protección frente a errores). Para activarla: Settings → Pages → Source: «GitHub Actions»."
+          fi
+      - uses: actions/checkout@v4
+        if: steps.modo.outputs.modo == 'workflow'
+      - uses: actions/setup-node@v4
+        if: steps.modo.outputs.modo == 'workflow'
+        with:
+          node-version: 20
+      - uses: actions/configure-pages@v5
+        if: steps.modo.outputs.modo == 'workflow'
+        id: pages
+      - name: Mapa del sitio
+        if: steps.modo.outputs.modo == 'workflow'
+        run: node herramientas/sitemap.mjs "${{ steps.pages.outputs.base_url }}/"
+      - name: Preparar archivos
+        if: steps.modo.outputs.modo == 'workflow'
+        run: |
+          mkdir _site
+          cp -r *.html *.js *.css *.xml robots.txt img lib en _site/ 2>/dev/null || true
+          [ -f CNAME ] && cp CNAME _site/ || true
+      - name: Reducir fotos grandes de la galería
+        if: steps.modo.outputs.modo == 'workflow'
+        run: |
+          if [ -d _site/img/galeria ]; then
+            pip install --quiet pillow
+            python3 - <<'PY'
+          import pathlib
+          from PIL import Image, ImageOps
+          for f in pathlib.Path('_site/img/galeria').rglob('*'):
+              if f.suffix.lower() not in ('.jpg', '.jpeg', '.png', '.webp'): continue
+              im = ImageOps.exif_transpose(Image.open(f))
+              if max(im.size) > 1800 or f.stat().st_size > 600_000:
+                  im.thumbnail((1800, 1800))
+                  if f.suffix.lower() in ('.jpg', '.jpeg'): im.convert('RGB').save(f, quality=82, optimize=True, progressive=True)
+                  else: im.save(f, optimize=True)
+                  print('reducida', f)
+          PY
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.modo.outputs.modo == 'workflow'
+        with:
+          path: _site
+      - uses: actions/deploy-pages@v4
+        if: steps.modo.outputs.modo == 'workflow'
+        id: deploy

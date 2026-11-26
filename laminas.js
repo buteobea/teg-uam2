@@ -86,9 +86,12 @@ const PLATES = {
   }
 };
 const KINDS = Object.keys(PLATES);
+let UID = 0;
 function plate(kind, seed = 1, cls = '') {
-  const f = PLATES[kind] || PLATES.biogeografia;
-  return `<svg class="${cls}" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${f(rng(seed * 9973 + kind.length))}</svg>`;
+  const f = PLATES[kind] || PLATES.biogeografia, u = 'p' + (++UID) + '-';
+  // identificadores únicos por lámina (evita ids repetidos cuando hay varias en la misma página)
+  const s = f(rng(seed * 9973 + kind.length)).replace(/id="(st|dt|cr)"/g, `id="${u}$1"`).replace(/url\(#(st|dt|cr)\)/g, `url(#${u}$1)`);
+  return `<svg class="${cls}" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${s}</svg>`;
 }
 window.TEG_PLATES = { PLATES, KINDS, plate, rng };
 })();

@@ -8,14 +8,16 @@ Web estática (HTML + CSS + JavaScript): sin PHP, WordPress ni base de datos, si
 
 | Página | Contenido |
 |---|---|
-| `index.html` | Portada: espectrograma real (sin sonido), cifras clave y acceso a todas las secciones |
+| `index.html` | Portada: espectrograma real (sin sonido), cifras clave, acceso a todas las secciones, red de colaboraciones, financiadores y colaboradores |
 | `lineas.html` | Las cinco líneas, con su equipo, proyectos en curso y publicaciones recientes |
 | `equipo.html` | Diagrama de ordenación del equipo y listado con buscador |
 | `miembro.html?id=…` | Ficha individual (se genera sola: publicaciones, proyectos y tesis de cada persona) |
 | `proyectos.html` | Diagrama de Gantt de proyectos con filtros |
 | `proyecto.html?id=…` | Ficha de cada proyecto: resumen, financiación, IP, equipo y enlace a la web oficial |
 | `mapa.html` | Mapa mundial y de España con las zonas de trabajo y colaboraciones |
-| `publicaciones.html` | Evolución anual, buscador y botón «Copiar cita» |
+| `publicaciones.html` | Evolución anual, impacto (citas e índice h), buscador y botón «Copiar cita» |
+| `red.html` | Red de coautorías entre miembros y con otras instituciones, y países colaboradores |
+| `galeria.html` | Galería de fotos de campo (aparece en el menú cuando hay fotos) |
 | `tesis.html` | Calendario de defensas y listado de tesis |
 | `novedades.html` | Novedades y presencia en medios |
 | `contacto.html` | Contacto, formación y ofertas de TFG/TFM/tesis |
@@ -51,7 +53,7 @@ Las ilustraciones de las líneas y noticias se generan en el navegador (son vect
 
 ## Publicaciones automáticas
 
-`.github/workflows/publicaciones.yml` ejecuta `herramientas/actualizar-publicaciones.mjs` los días 1 y 15 de cada mes. Busca en [OpenAlex](https://openalex.org) los trabajos nuevos de cada miembro (por ORCID o por nombre + afiliación UAM), descarta los duplicados y los guarda en `datos-auto.js`. Se puede lanzar a mano en *Actions → Publicaciones → Run workflow*. Si una persona sale mal identificada, corrige su id en `herramientas/autores-openalex.json`. Para pasar una publicación automática a la lista principal basta con moverla a `PUBLICACIONES`.
+`.github/workflows/publicaciones.yml` ejecuta `herramientas/actualizar-publicaciones.mjs` los días 1 y 15 de cada mes. Busca en [OpenAlex](https://openalex.org) los trabajos nuevos de cada miembro (por ORCID o por nombre + afiliación UAM), descarta los duplicados y los guarda en `datos-auto.js`. Después, `herramientas/actualizar-citas.mjs` actualiza en `datos-citas.js` las citas de cada publicación, el índice h de cada miembro y las instituciones coautoras (para la página Red). Se puede lanzar a mano en *Actions → Actualizar publicaciones → Run workflow*. Si una persona sale mal identificada, corrige su id en `herramientas/autores-openalex.json`. Para pasar una publicación automática a la lista principal basta con moverla a `PUBLICACIONES`.
 
 ## Espectrograma de la portada
 
@@ -69,14 +71,24 @@ Genera `img/espectrograma.png` y `espectrograma.js`. Mientras `espectrograma.js`
 
 Con [GoatCounter](https://www.goatcounter.com) (gratuito, sin cookies, no necesita banner de consentimiento): crea una cuenta, por ejemplo `teguam`, y escribe ese código en `CONFIG.goatcounter` en `datos.js`. Las estadísticas se consultan en `https://teguam.goatcounter.com`.
 
-## Publicación
+## Publicación y comprobación automática
 
-*Settings → Pages → Build and deployment → Deploy from a branch → `main` / `(root)`*.
+`.github/workflows/publicar.yml` se ejecuta en cada cambio:
+
+1. **Comprueba** `datos.js` con `herramientas/validar.mjs` (comas y comillas, campos obligatorios, años, líneas que existen, fotos que existen…). Si hay errores, marca el cambio con una ✗, indica la línea y **no publica**: sigue en línea la última versión correcta. También se puede ejecutar en local: `node herramientas/validar.mjs`.
+2. **Publica** la web en GitHub Pages: genera `sitemap.xml` (para Google) y reduce las fotos grandes de la galería.
+
+Para que la comprobación bloquee la publicación hay que elegir, una sola vez, *Settings → Pages → Build and deployment → Source → **GitHub Actions***. Mientras siga en «Deploy from a branch», la web se publica directamente desde `main` y la comprobación solo avisa.
+
+### Vista previa al compartir
+
+Cada página lleva etiquetas Open Graph y Twitter: al pegar el enlace en WhatsApp, LinkedIn, X, Slack, etc. aparece una tarjeta con la imagen `img/compartir.jpg`, el título y la descripción. La dirección de la web está en la variable `SITE` del generador de páginas; si la web cambia de dominio, hay que actualizarla y regenerar las páginas (o pedir ayuda a quien administra la web).
 Para usar el dominio `teguam.es`: *Settings → Pages → Custom domain* y crear en el proveedor del dominio los registros DNS que indica GitHub.
 
 ## Dependencias externas
 
 - Tipografías de Google Fonts (Archivo, IBM Plex Mono).
 - Contornos de países para el mapa: `world-atlas@2.0.2` desde cdn.jsdelivr.net (si no carga, la página muestra igualmente la lista de lugares).
-- `lib/d3.min.js` (d3 v7.9.0, incluido en el repositorio) para las proyecciones del mapa.
+- `lib/d3.min.js` (d3 v7.9.0, incluido en el repositorio) para las proyecciones del mapa y la red de colaboraciones.
+- [OpenAlex](https://openalex.org) (API abierta y gratuita) para publicaciones nuevas, citas, índice h e instituciones coautoras.
 

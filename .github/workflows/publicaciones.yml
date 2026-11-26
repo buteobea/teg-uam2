@@ -1,5 +1,6 @@
 # Busca publicaciones nuevas de los miembros del grupo en OpenAlex
 # el día 1 y el día 15 de cada mes (cada dos semanas) y las añade a datos-auto.js.
+# Después actualiza las citas, el índice h y las instituciones coautoras (datos-citas.js).
 # También se puede lanzar a mano: pestaña «Actions» → «Actualizar publicaciones» → «Run workflow».
 name: Actualizar publicaciones
 on:
@@ -18,12 +19,14 @@ jobs:
           node-version: 20
       - name: Buscar publicaciones nuevas
         run: node herramientas/actualizar-publicaciones.mjs
+      - name: Actualizar citas e índice h
+        run: node herramientas/actualizar-citas.mjs
       - name: Guardar cambios
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "Actualización automática TEG"
             git config user.email "actions@users.noreply.github.com"
-            git add datos-auto.js herramientas/autores-openalex.json
+            git add datos-auto.js datos-citas.js herramientas/autores-openalex.json
             git commit -m "Publicaciones: actualización automática $(date +%Y-%m-%d)"
             git push
           else

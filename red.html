@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red de colaboraciones · TEG-UAM</title>
+<meta name="description" content="Red de coautorías del TEG-UAM con otras instituciones.">
+<link rel="icon" href="img/logo.png">
+<link rel="alternate" hreflang="en" href="en/red.html">
+<link rel="canonical" href="https://buteobea.github.io/teg-uam2/red.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TEG-UAM">
+<meta property="og:title" content="Red de colaboraciones · TEG-UAM">
+<meta property="og:description" content="Red de coautorías del TEG-UAM con otras instituciones.">
+<meta property="og:url" content="https://buteobea.github.io/teg-uam2/red.html">
+<meta property="og:image" content="https://buteobea.github.io/teg-uam2/img/compartir.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Espectrograma del canto de la alondra ricotí y logotipo del TEG-UAM">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#12170E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="red">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Ruta"><a href="index.html">TEG-UAM</a><span>/</span><span>Red</span></nav>
+  <h1>Red de colaboraciones</h1>
+  <p class="lede">Quién publica con quién: coautorías entre las personas del grupo y con otras instituciones, a partir de las publicaciones de esta web.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="tools"><div class="chips" id="rchips" role="group" aria-label="Filtros de la red"></div></div>
+  <div class="netwrap">
+    <figure class="netfig" id="net"><svg role="img" aria-label="Red de coautorías entre miembros del grupo y otras instituciones"></svg><div class="nettip" hidden></div></figure>
+    <aside class="netside"><h2 class="h3">Instituciones con más publicaciones conjuntas</h2><ol class="instlist" id="ilist"></ol></aside>
+  </div>
+  <div class="legend"><span><i style="background:var(--olive);border-radius:50%"></i>Miembro del grupo</span><span><i style="background:var(--mute);border-radius:50%"></i>Antiguo miembro</span><span><i style="background:var(--straw);transform:rotate(45deg);border:1px solid var(--olive)"></i>Institución española</span><span><i style="background:var(--red);transform:rotate(45deg);border:1px solid var(--olive)"></i>Institución extranjera</span></div>
+  <p class="note" id="rnote" style="margin-top:10px"></p>
+</div></section>
+<section class="band tint"><div class="wrap">
+  <div class="sec-head rv"><h2>Instituciones coautoras por país</h2></div>
+  <div class="ctry" id="countries"></div>
+</div></section>
+</main>
+<script src="datos.js"></script>
+<script src="datos-auto.js"></script>
+<script src="datos-citas.js"></script>
+<script src="laminas.js"></script>
+<script src="lib/d3.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

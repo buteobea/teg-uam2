@@ -7,6 +7,19 @@
 <meta name="description" content="Terrestrial Ecosystem Ecology and Conservation Research Group (TEG-UAM), Universidad Autónoma de Madrid.">
 <link rel="icon" href="../img/logo.png">
 <link rel="alternate" hreflang="es" href="../index.html">
+<link rel="canonical" href="https://buteobea.github.io/teg-uam2/en/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TEG-UAM">
+<meta property="og:title" content="TEG-UAM · Terrestrial Ecology and Conservation Group">
+<meta property="og:description" content="Terrestrial Ecosystem Ecology and Conservation Research Group (TEG-UAM), Universidad Autónoma de Madrid.">
+<meta property="og:url" content="https://buteobea.github.io/teg-uam2/en/">
+<meta property="og:image" content="https://buteobea.github.io/teg-uam2/img/compartir.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Spectrogram of a Dupont's lark song and the TEG-UAM logo">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#12170E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ResearchOrganization", "name": "TEG-UAM · Grupo de Investigación de Ecología y Conservación de Ecosistemas Terrestres", "alternateName": "Terrestrial Ecology Group", "url": "https://buteobea.github.io/teg-uam2/", "logo": "https://buteobea.github.io/teg-uam2/img/logo.png", "parentOrganization": {"@type": "CollegeOrUniversity", "name": "Universidad Autónoma de Madrid", "url": "https://www.uam.es"}, "address": {"@type": "PostalAddress", "streetAddress": "C/ Darwin 2, Edificio de Biología", "addressLocality": "Madrid", "postalCode": "28049", "addressCountry": "ES"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../styles.css">
@@ -25,6 +38,7 @@
 </section>
 <section class="band"><div class="wrap">
   <p class="manifest rv">An established UAM research group, linked to <b>CIBC-UAM</b>, combining fieldwork, new monitoring technologies and knowledge transfer to public agencies and companies.</p>
+  <h2 class="sr">What we do</h2>
   <div class="aims rv">
     <div><span class="mono">Understand</span><h3 style="margin:6px 0">Key ecological processes</h3><p class="mute">Niche, interactions, movement and community dynamics in terrestrial ecosystems.</p></div>
     <div><span class="mono">Conserve</span><h3 style="margin:6px 0">Criteria and tools</h3><p class="mute">For managing threatened species, habitats and natural resources.</p></div>
@@ -36,15 +50,27 @@
   <div class="index" id="doors"></div>
 </div></section>
 <section class="band"><div class="wrap feature rv" id="feat"></div></section>
+<section class="band dark"><div class="wrap hnet">
+  <div><span class="mono" style="color:var(--leaf)">Collaboration network</span><h2 style="margin:10px 0 14px">Science as a network</h2><p class="mute">Each green dot is a group member; each diamond, an institution they co-author with. Lines join those who publish together.</p><div class="kpis" id="hnetk"></div><div class="btns"><a class="btn" href="red.html">Explore the network</a></div></div>
+  <figure class="netfig small" id="hnet"><svg role="img" aria-label="Co-authorship network between group members and other institutions"></svg><div class="nettip" hidden></div></figure>
+</div></section>
 <section class="band tint"><div class="wrap">
   <div class="sec-head rv" style="align-items:center"><h2>News</h2><p class="mute">Awards, projects, open science and outreach. <a href="novedades.html">See all →</a></p></div>
   <div class="news" id="lastnews"></div>
 </div></section>
+<section class="band"><div class="wrap">
+  <div class="sec-head rv"><h2>Supported by</h2><p class="mute">Organisations that fund or have funded the group’s projects and contracts.</p></div>
+  <div class="funds" id="funders"></div>
+  <div class="sec-head rv" style="margin-top:56px"><h2>We work with</h2><p class="mute" id="collabtxt"></p></div>
+  <div class="funds" id="collabs"></div>
+</div></section>
 </main>
 <script src="../datos.js"></script>
 <script src="../datos-auto.js"></script>
+<script src="../datos-citas.js"></script>
 <script src="../laminas.js"></script>
 <script src="../espectrograma.js"></script>
+<script src="../lib/d3.min.js"></script>
 <script src="../app.js"></script>
 </body>
 </html>

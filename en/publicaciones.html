@@ -7,6 +7,18 @@
 <meta name="description" content="Scientific publications of TEG-UAM.">
 <link rel="icon" href="../img/logo.png">
 <link rel="alternate" hreflang="es" href="../publicaciones.html">
+<link rel="canonical" href="https://buteobea.github.io/teg-uam2/en/publicaciones.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TEG-UAM">
+<meta property="og:title" content="Publications · TEG-UAM">
+<meta property="og:description" content="Scientific publications of TEG-UAM.">
+<meta property="og:url" content="https://buteobea.github.io/teg-uam2/en/publicaciones.html">
+<meta property="og:image" content="https://buteobea.github.io/teg-uam2/img/compartir.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Spectrogram of a Dupont's lark song and the TEG-UAM logo">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#12170E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../styles.css">
@@ -23,9 +35,10 @@
   <div class="sec-head rv"><h2>Output per year</h2><p class="mute" id="chartnote"></p></div>
   <div class="chartfig rv" id="chart"><svg role="img" aria-label="Papers published per year"></svg></div>
   <div class="legend"><span><i style="background:var(--leaf)"></i>Papers</span><span><i style="background:var(--olive)"></i>In Q1 journals</span><span><i style="border:1.5px dashed var(--mute)"></i>Year without data</span></div>
+  <div id="impsec"><h2 style="margin-top:56px">Impact</h2><div class="impact rv" id="impact"></div><p class="note" id="impnote"></p></div>
 </div></section>
 <section class="band tint"><div class="wrap">
-  <div class="tools"><input class="search" id="bq" type="search" placeholder="Author, title, journal…" aria-label="Search publications"><select class="sel" id="by" aria-label="Year"></select><select class="sel" id="bt" aria-label="Type"><option value="">All</option><option value="art">Papers</option><option value="cap">Books and chapters</option><option value="div">Outreach</option><option value="nota">Editorials, letters and notes</option><option value="prensa">Press</option></select><label style="display:flex;gap:8px;align-items:center;min-height:46px"><input type="checkbox" id="boa"> Open access only</label></div>
+  <div class="tools"><input class="search" id="bq" type="search" placeholder="Author, title, journal…" aria-label="Search publications"><select class="sel" id="by" aria-label="Year"></select><select class="sel" id="bt" aria-label="Type"><option value="">All</option><option value="art">Papers</option><option value="cap">Books and chapters</option><option value="div">Outreach</option><option value="nota">Editorials, letters and notes</option><option value="prensa">Press</option></select><select class="sel" id="bs" aria-label="Sort"><option value="">Newest first</option><option value="c">Most cited</option></select><label style="display:flex;gap:8px;align-items:center;min-height:46px"><input type="checkbox" id="boa"> Open access only</label></div>
   <p class="count" id="bcount"></p>
   <div id="pubs"></div>
   <div style="margin-top:18px"><button class="btn ghost" id="bmore" style="color:var(--text)">Show more</button></div>
@@ -33,6 +46,7 @@
 </main>
 <script src="../datos.js"></script>
 <script src="../datos-auto.js"></script>
+<script src="../datos-citas.js"></script>
 <script src="../laminas.js"></script>
 <script src="../app.js"></script>
 </body>

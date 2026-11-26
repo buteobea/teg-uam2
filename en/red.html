@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collaboration network · TEG-UAM</title>
+<meta name="description" content="Co-authorship network of TEG-UAM with other institutions.">
+<link rel="icon" href="../img/logo.png">
+<link rel="alternate" hreflang="es" href="../red.html">
+<link rel="canonical" href="https://buteobea.github.io/teg-uam2/en/red.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TEG-UAM">
+<meta property="og:title" content="Collaboration network · TEG-UAM">
+<meta property="og:description" content="Co-authorship network of TEG-UAM with other institutions.">
+<meta property="og:url" content="https://buteobea.github.io/teg-uam2/en/red.html">
+<meta property="og:image" content="https://buteobea.github.io/teg-uam2/img/compartir.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Spectrogram of a Dupont's lark song and the TEG-UAM logo">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#12170E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-page="red">
+<main>
+<section class="phead"><div class="art" aria-hidden="true"></div><div class="wrap">
+  <nav class="crumb mono" aria-label="Breadcrumb"><a href="index.html">TEG-UAM</a><span>/</span><span>Network</span></nav>
+  <h1>Collaboration network</h1>
+  <p class="lede">Who publishes with whom: co-authorships among group members and with other institutions, based on the publications on this site.</p>
+  <div class="kpis" id="kp"></div>
+</div></section>
+<section class="band"><div class="wrap">
+  <div class="tools"><div class="chips" id="rchips" role="group" aria-label="Network filters"></div></div>
+  <div class="netwrap">
+    <figure class="netfig" id="net"><svg role="img" aria-label="Co-authorship network between group members and other institutions"></svg><div class="nettip" hidden></div></figure>
+    <aside class="netside"><h2 class="h3">Institutions with most joint publications</h2><ol class="instlist" id="ilist"></ol></aside>
+  </div>
+  <div class="legend"><span><i style="background:var(--olive);border-radius:50%"></i>Group member</span><span><i style="background:var(--mute);border-radius:50%"></i>Former member</span><span><i style="background:var(--straw);transform:rotate(45deg);border:1px solid var(--olive)"></i>Spanish institution</span><span><i style="background:var(--red);transform:rotate(45deg);border:1px solid var(--olive)"></i>Institution abroad</span></div>
+  <p class="note" id="rnote" style="margin-top:10px"></p>
+</div></section>
+<section class="band tint"><div class="wrap">
+  <div class="sec-head rv"><h2>Co-authoring institutions by country</h2></div>
+  <div class="ctry" id="countries"></div>
+</div></section>
+</main>
+<script src="../datos.js"></script>
+<script src="../datos-auto.js"></script>
+<script src="../datos-citas.js"></script>
+<script src="../laminas.js"></script>
+<script src="../lib/d3.min.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>
