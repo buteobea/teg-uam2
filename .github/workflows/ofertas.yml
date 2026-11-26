@@ -6,7 +6,7 @@
 name: Ofertas
 on:
   issues:
-    types: [opened, edited, closed, reopened, labeled]
+    types: [opened, edited, closed, reopened]
 permissions:
   contents: write
   issues: write

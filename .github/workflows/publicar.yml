@@ -32,13 +32,12 @@ jobs:
           node-version: 20
       - name: Comprobar datos.js
         run: node herramientas/validar.mjs
-  publicar:
+  construir:
     needs: comprobar
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    outputs:
+      modo: ${{ steps.modo.outputs.modo }}
     steps:
       - name: ¿Está GitHub Pages configurado para publicar desde Actions?
         id: modo
@@ -90,6 +89,13 @@ jobs:
         if: steps.modo.outputs.modo == 'workflow'
         with:
           path: _site
+  publicar:
+    needs: construir
+    if: needs.construir.outputs.modo == 'workflow'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - uses: actions/deploy-pages@v4
-        if: steps.modo.outputs.modo == 'workflow'
         id: deploy
