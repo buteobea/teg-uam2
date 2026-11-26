@@ -104,13 +104,21 @@ const fdate = d => { const x = new Date(d + 'T12:00'); return isNaN(x) ? d : x.t
 const TIPO_EN = { 'TFG': 'BSc thesis', 'TFM': 'MSc thesis', 'Tesis doctoral': 'PhD', 'Prácticas externas': 'Internship', 'Erasmus+ / estancia': 'Erasmus+ / visit', 'Contrato': 'Contract', 'Otro': 'Other' };
 const otipo = o => EN ? (TIPO_EN[o.tipo] || o.tipo) : o.tipo;
 const linkPeople = s => String(s || '').split(/\s*,\s*|\s+y\s+|\s+and\s+/).filter(Boolean).map(n => { const m = MALL.find(x => norm(x.nombre).includes(norm(n)) || norm(n).split(' ').every(w => norm(x.nombre).includes(w))); return m ? `<a href="miembro.html?id=${slug(m.nombre)}">${esc(n)}</a>` : esc(n); }).join(', ');
+// markdown mínimo (negrita, cursiva, listas y párrafos) para los textos de las ofertas
+const mdLite = s => { const inl = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*?)\*/g, '$1<em>$2</em>').replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
+  const out = []; let list = null;
+  for (const raw of String(s || '').replace(/\r/g, '').split('\n')) { const l = raw.trim(); const ul = l.match(/^[-*•]\s+(.*)/), ol = l.match(/^\d+[.)]\s+(.*)/);
+    if (ul || ol) { const tag = ul ? 'ul' : 'ol'; if (!list || list.tag !== tag) { if (list) out.push(`</${list.tag}>`); list = { tag }; out.push(`<${tag}>`); } out.push(`<li>${inl((ul || ol)[1])}</li>`); continue; }
+    if (list) { out.push(`</${list.tag}>`); list = null; }
+    if (l) out.push(`<p>${inl(l)}</p>`); }
+  if (list) out.push(`</${list.tag}>`); return out.join(''); };
 function offerCard(o) {
   const days = o.plazo ? Math.ceil((new Date(o.plazo + 'T23:59') - new Date()) / 864e5) : null;
   const rem = EN ? ({ 'Sí': 'Yes', 'No': 'No', 'Depende de la convocatoria': 'Depends on the call' }[o.remunerada] || o.remunerada) : o.remunerada;
-  const rows = [[S.ofReq, o.requisitos && esc(o.requisitos).replace(/\n/g, '<br>')], [S.ofDir, o.dirige && linkPeople(o.dirige)], [S.ofStart, o.inicio && esc(o.inicio)], [S.ofDur, o.duracion && esc(o.duracion)], [S.ofPaid, rem && esc(rem)]].filter(r => r[1]);
+  const rows = [[S.ofReq, o.requisitos && mdLite(o.requisitos)], [S.ofDir, o.dirige && linkPeople(o.dirige)], [S.ofStart, o.inicio && esc(o.inicio)], [S.ofDur, o.duracion && esc(o.duracion)], [S.ofPaid, rem && esc(rem)]].filter(r => r[1]);
   const subj = encodeURIComponent((EN ? 'Position: ' : 'Oferta: ') + tr(o, 't'));
   return `<article class="offer"><div class="otop"><span class="otag">${esc(otipo(o))}</span>${o.linea ? `<a class="tag" href="lineas.html#${esc(o.linea)}">${esc(lShort(o.linea))}</a>` : ''}${o.plazo ? `<span class="oplazo${days <= 14 ? ' soon' : ''}">${S.ofDeadline} ${fdate(o.plazo)}${days != null && days <= 60 ? ' · ' + S.ofLeft(days) : ''}</span>` : `<span class="oplazo">${S.ofOpen}</span>`}</div>
-    <h3>${esc(tr(o, 't'))}</h3><p>${esc(tr(o, 'txt')).replace(/\n/g, '<br>')}</p>
+    <h3>${esc(tr(o, 't'))}</h3><div class="otxt">${mdLite(tr(o, 'txt'))}</div>
     ${rows.length ? `<dl class="ficha">${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>` : ''}
     <div class="btns">${o.contacto ? `<a class="btn" href="mailto:${esc(o.contacto)}?subject=${subj}">${S.ofWrite}</a>` : ''}${o.enlace ? `<a class="btn ghost" href="${esc(o.enlace)}">${S.ofCall} ↗</a>` : ''}</div></article>`;
 }
