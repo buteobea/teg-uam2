@@ -8,8 +8,9 @@
 
 /* CONFIGURACIÓN GENERAL
    goatcounter: código de la cuenta de GoatCounter (p. ej. "teg-uam") para las estadísticas de visitas.
-   estadisticas_publicas: true si el panel de GoatCounter es público (se enlaza desde el pie). */
-window.CONFIG = { goatcounter: "", estadisticas_publicas: false };
+   estadisticas_publicas: true si el panel de GoatCounter es público (se enlaza desde el pie).
+   repo: repositorio de GitHub de la web (usuario/nombre); cámbialo si se traslada a otra cuenta u organización. */
+window.CONFIG = { goatcounter: "", estadisticas_publicas: false, repo: "buteobea/teg-uam2" };
 
 /* LÍNEAS: id corto (se usa en miembros, proyectos y lugares).
    img: foto opcional de alta calidad (si está vacía se dibuja una lámina).
@@ -707,7 +708,14 @@ window.NOVEDADES = [
   {"fecha": "jul.–oct. 2026", "tipo": "Divulgación", "t": "El TEG en El País", "txt": "Tribunas sobre incendios y artículos sobre murciélagos urbanos en Madrid.", "img": "", "t_en": "The TEG in El País", "txt_en": "Opinion pieces on wildfires and articles on urban bats in Madrid."}
 ];
 
-/* OFERTAS: TFG, TFM, tesis o contratos abiertos. Vacía = se muestra un mensaje genérico. */
+/* OFERTAS: TFG, TFM, tesis, prácticas o contratos abiertos.
+   La forma más fácil de publicar una es el formulario «Nueva oferta» de la pestaña Issues de GitHub:
+   la oferta se añade aquí sola (campo issue) y se retira al cerrar la issue.
+   También se puede añadir a mano, con estos campos:
+   tipo (TFG | TFM | Tesis doctoral | Prácticas externas | Erasmus+ / estancia | Contrato | Otro) · t (título) · txt (descripción)
+   t_en · txt_en · requisitos · linea (id) · dirige (nombres separados por comas) · contacto (correo)
+   plazo (AAAA-MM-DD; la oferta se oculta sola al día siguiente) · inicio · duracion · remunerada (Sí | No | Depende de la convocatoria) · enlace
+   Vacía = se muestra un mensaje genérico. */
 window.OFERTAS = [];
 
 /* PREMIOS Y RECONOCIMIENTOS (incluye patentes y modelos de utilidad). */

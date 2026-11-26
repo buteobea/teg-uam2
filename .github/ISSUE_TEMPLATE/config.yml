@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Guía para editar la web
+    url: https://github.com/buteobea/teg-uam2/blob/main/EDITAR.md
+    about: Cómo añadir noticias, miembros, proyectos, fotos…

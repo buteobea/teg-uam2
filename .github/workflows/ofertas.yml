@@ -1,0 +1,68 @@
+# Publica en la web las ofertas creadas con el formulario «Nueva oferta» (pestaña Issues).
+# · Abrir o editar la issue → la oferta se crea o se actualiza en datos.js (lista OFERTAS).
+# · Cerrar la issue → la oferta se retira.
+# Solo se aceptan ofertas de personas con acceso al repositorio (propietaria o colaboradores);
+# si otra persona usa el formulario, no se publica nada y se le explica en un comentario.
+name: Ofertas
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled]
+permissions:
+  contents: write
+  issues: write
+  pages: write
+concurrency:
+  group: ofertas
+  cancel-in-progress: false
+jobs:
+  oferta:
+    if: contains(github.event.issue.labels.*.name, 'oferta') || startsWith(github.event.issue.title, '[Oferta]')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NUMERO: ${{ github.event.issue.number }}
+      ACCION: ${{ github.event.action }}
+      CUERPO: ${{ github.event.issue.body }}
+      URL: ${{ github.event.issue.html_url }}
+      QUIEN: ${{ github.event.issue.author_association }}
+    steps:
+      - name: ¿Es del grupo?
+        id: permiso
+        run: |
+          case "$QUIEN" in OWNER|MEMBER|COLLABORATOR) echo "ok=1" >> "$GITHUB_OUTPUT";; *) echo "ok=0" >> "$GITHUB_OUTPUT";; esac
+      - name: Avisar si no es del grupo
+        if: steps.permiso.outputs.ok == '0' && github.event.action == 'opened'
+        run: gh issue comment "$NUMERO" -R "${{ github.repository }}" --body "Gracias. Solo los miembros del TEG-UAM con acceso al repositorio pueden publicar ofertas automáticamente; quien administra la web la revisará."
+      - uses: actions/checkout@v4
+        if: steps.permiso.outputs.ok == '1'
+      - uses: actions/setup-node@v4
+        if: steps.permiso.outputs.ok == '1'
+        with:
+          node-version: 20
+      - name: Actualizar OFERTAS en datos.js
+        if: steps.permiso.outputs.ok == '1'
+        id: oferta
+        run: |
+          node herramientas/oferta-desde-issue.mjs > /tmp/mensaje.txt || true
+          cat /tmp/mensaje.txt
+          if grep -q '^ERROR' /tmp/mensaje.txt; then git checkout -- datos.js; fi
+          if [ -n "$(git status --porcelain datos.js)" ]; then
+            if node herramientas/validar.mjs; then echo "cambio=1" >> "$GITHUB_OUTPUT"
+            else git checkout -- datos.js; echo "ERROR: la oferta tiene un dato que la web no acepta (detalles en la pestaña Actions). Revisa el formulario." > /tmp/mensaje.txt; fi
+          fi
+      - name: Guardar
+        if: steps.oferta.outputs.cambio == '1'
+        run: |
+          git config user.name "Ofertas TEG"
+          git config user.email "actions@users.noreply.github.com"
+          git add datos.js
+          git commit -m "Ofertas: issue #$NUMERO ($ACCION)"
+          git push
+      - name: Pedir a GitHub Pages que reconstruya la web
+        if: steps.oferta.outputs.cambio == '1'
+        run: |
+          m=$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null || echo "?")
+          if [ "$m" = "legacy" ]; then gh api -X POST "repos/${{ github.repository }}/pages/builds" >/dev/null && echo "Reconstrucción solicitada."; fi
+      - name: Comentar en la issue
+        if: steps.permiso.outputs.ok == '1' && github.event.action != 'labeled'
+        run: gh issue comment "$NUMERO" -R "${{ github.repository }}" --body-file /tmp/mensaje.txt

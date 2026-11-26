@@ -80,6 +80,10 @@ Con [GoatCounter](https://www.goatcounter.com) (gratuito, sin cookies, no necesi
 
 Para que la comprobación bloquee la publicación hay que elegir, una sola vez, *Settings → Pages → Build and deployment → Source → **GitHub Actions***. Mientras siga en «Deploy from a branch», la web se publica directamente desde `main` y la comprobación solo avisa.
 
+### Ofertas con formulario
+
+`.github/ISSUE_TEMPLATE/oferta.yml` es un formulario estandarizado (pestaña *Issues → New issue → Nueva oferta*). Al enviarlo, `.github/workflows/ofertas.yml` comprueba que quien lo envía tiene acceso al repositorio, convierte la oferta en una entrada de `OFERTAS` en `datos.js` (`herramientas/oferta-desde-issue.mjs`), la valida, la publica y responde en la issue. Editar la issue actualiza la oferta; cerrarla la retira. Las ofertas con fecha límite se ocultan solas al pasar el plazo.
+
 ### Vista previa al compartir
 
 Cada página lleva etiquetas Open Graph y Twitter: al pegar el enlace en WhatsApp, LinkedIn, X, Slack, etc. aparece una tarjeta con la imagen `img/compartir.jpg`, el título y la descripción. La dirección de la web está en la variable `SITE` del generador de páginas; si la web cambia de dominio, hay que actualizarla y regenerar las páginas (o pedir ayuda a quien administra la web).

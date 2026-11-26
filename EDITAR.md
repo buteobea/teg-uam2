@@ -143,14 +143,25 @@ Normalmente **no hace falta**: se añaden solas cada dos semanas. Úsalo para li
 
 ### Publicar una oferta de TFG, TFM, tesis o contrato → `OFERTAS`
 
+**Lo más fácil: el formulario.** No hace falta tocar `datos.js`.
+
+1. En el repositorio, abre la pestaña **Issues → New issue → «📢 Nueva oferta»** (o entra directamente en [este enlace](https://github.com/buteobea/teg-uam2/issues/new?template=oferta.yml); también está en la web, al final de «Ofertas abiertas»).
+2. Rellena los campos: tipo, título, descripción, línea, quién dirige, correo, fecha límite (AAAA-MM-DD), inicio, duración, si es remunerada y un enlace a la convocatoria. Los campos en inglés son opcionales.
+3. Pulsa **Submit new issue**. En un par de minutos la oferta aparece en la web (Contacto → Ofertas abiertas, aviso en la portada y en la ficha de quien la dirige) y GitHub te deja un comentario confirmándolo. Si falta algo o la fecha está mal escrita, el comentario te dice qué corregir.
+
+- **Corregirla:** en la issue, menú **···** → **Edit**, cambia lo que sea y guarda. La web se actualiza sola.
+- **Retirarla** (plaza cubierta): pulsa **Close issue**. Si pusiste fecha límite, también se oculta sola al día siguiente.
+- Solo publica automáticamente quien tiene acceso al repositorio. Si otra persona usa el formulario, no se publica nada.
+
+**A mano**, si lo prefieres, en `datos.js`:
+
 ```js
 window.OFERTAS = [
-  { "tipo": "TFM", "t": "Uso del espacio de la ganga ortega", "txt": "Trabajo de campo en primavera.",
-    "contacto": "nombre.apellido@uam.es" },
+  { "tipo": "TFM", "t": "Uso del espacio de la ganga ortega", "txt": "Trabajo de campo en primavera y análisis en R.",
+    "linea": "agraria", "dirige": "Juan Traba, Adrián Barrero", "contacto": "juan.traba@uam.es",
+    "plazo": "2027-03-31", "inicio": "septiembre 2027", "duracion": "1 curso", "remunerada": "No" },
 ];
 ```
-
-Cuando se cubra, bórrala. Si la lista queda vacía (`window.OFERTAS = [];`), la web muestra un mensaje genérico.
 
 ### Añadir un estudiante visitante o Erasmus → `ESTANCIAS`
 

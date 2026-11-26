@@ -96,6 +96,33 @@ Object.assign(S, EN ? {
   collabsH: 'Colaboramos con', collabsTxt: (n, c) => `Además, el grupo firma publicaciones con ${n} instituciones de ${c} países.`, seeNet: 'Ver la red de colaboraciones',
   galEmpty: 'Todavía no hay fotos en la galería.', galEmptyTxt: 'Cualquier miembro del grupo puede añadirlas siguiendo la guía de edición.', close: 'Cerrar', prev: 'Anterior', next: 'Siguiente', photoBy: 'Foto'
 });
+/* ---------- ofertas ---------- */
+const hoy = new Date().toISOString().slice(0, 10);
+const OV = (W.OFERTAS || []).filter(o => !o.plazo || o.plazo >= hoy);
+const REPO = CFG.repo || 'buteobea/teg-uam2';
+const fdate = d => { const x = new Date(d + 'T12:00'); return isNaN(x) ? d : x.toLocaleDateString(EN ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); };
+const TIPO_EN = { 'TFG': 'BSc thesis', 'TFM': 'MSc thesis', 'Tesis doctoral': 'PhD', 'Prácticas externas': 'Internship', 'Erasmus+ / estancia': 'Erasmus+ / visit', 'Contrato': 'Contract', 'Otro': 'Other' };
+const otipo = o => EN ? (TIPO_EN[o.tipo] || o.tipo) : o.tipo;
+const linkPeople = s => String(s || '').split(/\s*,\s*|\s+y\s+|\s+and\s+/).filter(Boolean).map(n => { const m = MALL.find(x => norm(x.nombre).includes(norm(n)) || norm(n).split(' ').every(w => norm(x.nombre).includes(w))); return m ? `<a href="miembro.html?id=${slug(m.nombre)}">${esc(n)}</a>` : esc(n); }).join(', ');
+function offerCard(o) {
+  const days = o.plazo ? Math.ceil((new Date(o.plazo + 'T23:59') - new Date()) / 864e5) : null;
+  const rem = EN ? ({ 'Sí': 'Yes', 'No': 'No', 'Depende de la convocatoria': 'Depends on the call' }[o.remunerada] || o.remunerada) : o.remunerada;
+  const rows = [[S.ofReq, o.requisitos && esc(o.requisitos).replace(/\n/g, '<br>')], [S.ofDir, o.dirige && linkPeople(o.dirige)], [S.ofStart, o.inicio && esc(o.inicio)], [S.ofDur, o.duracion && esc(o.duracion)], [S.ofPaid, rem && esc(rem)]].filter(r => r[1]);
+  const subj = encodeURIComponent((EN ? 'Position: ' : 'Oferta: ') + tr(o, 't'));
+  return `<article class="offer"><div class="otop"><span class="otag">${esc(otipo(o))}</span>${o.linea ? `<a class="tag" href="lineas.html#${esc(o.linea)}">${esc(lShort(o.linea))}</a>` : ''}${o.plazo ? `<span class="oplazo${days <= 14 ? ' soon' : ''}">${S.ofDeadline} ${fdate(o.plazo)}${days != null && days <= 60 ? ' · ' + S.ofLeft(days) : ''}</span>` : `<span class="oplazo">${S.ofOpen}</span>`}</div>
+    <h3>${esc(tr(o, 't'))}</h3><p>${esc(tr(o, 'txt')).replace(/\n/g, '<br>')}</p>
+    ${rows.length ? `<dl class="ficha">${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>` : ''}
+    <div class="btns">${o.contacto ? `<a class="btn" href="mailto:${esc(o.contacto)}?subject=${subj}">${S.ofWrite}</a>` : ''}${o.enlace ? `<a class="btn ghost" href="${esc(o.enlace)}">${S.ofCall} ↗</a>` : ''}</div></article>`;
+}
+Object.assign(S, EN ? {
+  ofReq: 'Requirements', ofDir: 'Supervisors', ofStart: 'Start', ofDur: 'Duration', ofPaid: 'Paid', ofDeadline: 'Apply by', ofOpen: 'Open until filled', ofLeft: n => n <= 0 ? 'last day' : n === 1 ? '1 day left' : n + ' days left',
+  ofWrite: 'Write to apply', ofCall: 'Call / more info', ofAll: 'All', ofPost: u => `Are you a group member? <a href="${u}">Publish a position with the form</a> (a GitHub account with access to the repository is required) or see the <a href="https://github.com/${REPO}/blob/main/EDITAR.md#publicar-una-oferta-de-tfg-tfm-tesis-o-contrato--ofertas">editing guide</a>.`,
+  ofNone: 'There are no open positions right now.', ofHome: n => n === 1 ? '1 open position' : n + ' open positions', ofHomeTxt: 'Right now:', ofSee: 'See positions', ofMine: n => `Open positions (${n})`
+} : {
+  ofReq: 'Requisitos', ofDir: 'Dirige', ofStart: 'Inicio', ofDur: 'Duración', ofPaid: 'Remunerada', ofDeadline: 'Plazo:', ofOpen: 'Abierta hasta cubrirse', ofLeft: n => n <= 0 ? 'último día' : n === 1 ? 'queda 1 día' : 'quedan ' + n + ' días',
+  ofWrite: 'Escribir para solicitarla', ofCall: 'Convocatoria / más información', ofAll: 'Todas', ofPost: u => `¿Eres del grupo? <a href="${u}">Publica una oferta con el formulario</a> (hace falta una cuenta de GitHub con acceso al repositorio) o consulta la <a href="https://github.com/${REPO}/blob/main/EDITAR.md#publicar-una-oferta-de-tfg-tfm-tesis-o-contrato--ofertas">guía de edición</a>.`,
+  ofNone: 'Ahora mismo no hay ofertas abiertas.', ofHome: n => n === 1 ? '1 oferta abierta' : n + ' ofertas abiertas', ofHomeTxt: 'Ahora mismo:', ofSee: 'Ver ofertas', ofMine: n => `Ofertas abiertas (${n})`
+});
 /* ---------- citas (OpenAlex) ---------- */
 const CI = W.CITAS || { obras: {}, instituciones: [], autores: {} };
 const GAL = W.GALERIA || [];
@@ -271,6 +298,7 @@ inicio() {
   if (f) $('#feat').innerHTML = `<div class="plate">${plate(f.linea, 11)}</div><div><span class="mono mute">${S.featured} · ${f.ini}–${f.fin}</span><h2 style="margin:10px 0 14px">${esc(tr(f, 't'))}</h2><p class="mute">${esc(tr(f, 'resumen') || f.fin_)}</p><div class="btns"><a class="btn" href="proyecto.html?id=${pid(f)}">${S.seeProj}</a><a class="btn ghost" href="proyectos.html">${S.allProj}</a></div></div>`;
   $('#lastnews').innerHTML = N.slice(0, 3).map((n, i) => newsCard(n, i)).join('');
   funders();
+  if (OV.length) $('#feat').closest('section').insertAdjacentHTML('afterend', `<section class="band tight"><div class="wrap offbar"><div><b>${S.ofHome(OV.length)}</b><span>${S.ofHomeTxt} ${[...new Set(OV.map(otipo))].join(' · ')}</span></div><a class="btn" href="contacto.html#ofertas">${S.ofSee} →</a></div></section>`);
   const nfig = $('#hnet'); if (nfig && window.d3) { const net = buildNet(24); if (net.nInst) { drawNet(nfig, net, { small: true }); $('#hnetk').innerHTML = [[net.nInst, S.netInst], [Object.keys(net.countries).length, S.netCountries], [net.pairs, S.netPairs]].map(s => `<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join(''); } else nfig.closest('section')?.remove(); }
 },
 
@@ -390,6 +418,7 @@ miembro() {
       ${links.length ? `<div class="tags">${links.map(l => `<a class="tag" href="${esc(l[0])}">${l[1]} ↗</a>`).join('')}</div>` : ''}
       ${own.length ? `<h2 class="h3" style="margin-top:24px">${S.ownTh}</h2><ul class="plist">${own.map(thItem).join('')}</ul>` : ''}
       ${pr.length ? `<h2 class="h3" style="margin-top:24px">${S.projects}</h2><ul class="plist">${pr.map(x => `<li><a href="proyecto.html?id=${pid(x)}">${esc(tr(x, 't'))}</a><small>${x.ini}–${x.fin} · ${esc(x.fin_)}${active(x) ? ' · ' + S.ongoing : ''}</small></li>`).join('')}</ul>` : ''}
+      ${(() => { const mo = OV.filter(o => signs(m, o.dirige) || norm(o.dirige || '').includes(norm(m.nombre.split(' ').slice(0, 2).join(' ')))); return mo.length ? `<h2 class="h3" style="margin-top:24px">${S.ofMine(mo.length)}</h2><ul class="plist">${mo.map(o => `<li><a href="contacto.html#ofertas">${esc(tr(o, 't'))}</a><small>${esc(otipo(o))}${o.plazo ? ' · ' + S.ofDeadline + ' ' + fdate(o.plazo) : ''}</small></li>`).join('')}</ul>` : ''; })()}
       ${th.length ? `<h2 class="h3" style="margin-top:24px">${S.dirTh(th.length)}</h2><ul class="plist">${th.map(thItem).join('')}</ul>` : ''}
     </div>
     <div>${oa ? `<h2 class="h3">${S.impact}</h2><dl class="ficha"><dt>${S.hIdx}</dt><dd>${oa.h ?? '–'}</dd><dt>${S.citsAll}</dt><dd>${(oa.citas || 0).toLocaleString(EN ? 'en' : 'es')}</dd><dt>${S.worksAll}</dt><dd>${oa.trabajos || 0}</dd></dl><p class="note">${S.impM(ciDate())} <a href="https://openalex.org/authors/${esc(oa.oa)}">${S.oaProfile} ↗</a></p><h2 class="h3" style="margin-top:24px">` : '<h2 class="h3">'}${S.pubs(pubs.length)}</h2><div id="mpubs">${pubs.length ? pubs.slice(0, 12).map(x => pubHTML(x.b, x.i)).join('') : `<p class="mute">${S.noPubs}</p>`}</div>${pubs.length > 12 ? `<button class="btn ghost" id="mmore" style="color:var(--text);margin-top:16px">${S.seeAll(pubs.length)}</button>` : ''}
@@ -554,7 +583,13 @@ contacto() {
   pageArt('evaluacion', 20);
   $('#coord').innerHTML = M.filter(m => m.coord).map(m => `<a class="person c" href="miembro.html?id=${slug(m.nombre)}"><span class="av">${avatar(m)}</span><div><b>${esc(m.nombre)}</b><span>${esc(email(m))}</span></div></a>`).join('');
   $('#estancias').innerHTML = (W.ESTANCIAS || []).map(e => `<li><b>${esc(e.quien)}</b> · ${esc(tr(e, 'prog'))}<small>${esc(e.origen)} · ${esc(e.fecha)} · ${esc(tr(e, 'tema'))}</small></li>`).join('');
-  $('#ofertas').innerHTML = O.length ? O.map(o => `<div><span class="mono mute">${esc(o.tipo || '')}</span><h3 style="margin-top:6px">${esc(tr(o, 't'))}</h3><p class="mute">${esc(tr(o, 'txt') || '')}${o.contacto ? ' · ' + esc(o.contacto) : ''}</p></div>`).join('') : `<div><h3>${S.offer}</h3><p class="mute" style="margin:6px 0 0">${S.offerTxt}</p></div>`;
+  const of = $('#ofertas');
+  if (of) { let ft = ''; const tipos = [...new Set(OV.map(o => o.tipo))];
+    const draw = () => { const l = OV.filter(o => !ft || o.tipo === ft); of.innerHTML = l.length ? l.map(offerCard).join('') : `<div class="offer empty"><h3>${S.offer}</h3><p class="mute" style="margin:6px 0 0">${S.offerTxt}</p></div>`; };
+    if (tipos.length > 1) { $('#ofchips').innerHTML = [['', S.ofAll]].concat(tipos.map(t => [t, otipo({ tipo: t })])).map(c => `<button class="chip" data-t="${esc(c[0])}" aria-pressed="${c[0] === ft}">${esc(c[1])}</button>`).join('');
+      $('#ofchips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; ft = b.dataset.t; $$('#ofchips .chip').forEach(x => x.setAttribute('aria-pressed', x === b)); draw(); }); }
+    draw(); $('#ofpost').innerHTML = S.ofPost(`https://github.com/${REPO}/issues/new?template=oferta.yml`);
+    if (location.hash === '#ofertas') $('#ofertas-sec').scrollIntoView(); }
 }
 };
 

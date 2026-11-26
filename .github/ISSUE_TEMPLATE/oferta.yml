@@ -1,0 +1,112 @@
+name: "📢 Nueva oferta (TFG, TFM, tesis, prácticas, contrato…)"
+description: Rellena este formulario y la oferta aparecerá sola en la web del grupo, en «Contacto → Ofertas abiertas».
+title: "[Oferta] "
+labels: ["oferta"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Solo para miembros del TEG-UAM.** Al pulsar *Submit new issue* la oferta se publica en la web en un par de minutos.
+        - Para **corregirla**, edita este formulario (menú **···** → *Edit*): la web se actualiza sola.
+        - Para **retirarla** (plaza cubierta), pulsa **Close issue**. Si pones fecha límite, también desaparece sola al pasar esa fecha.
+        - Los campos «en inglés» son opcionales: si los dejas vacíos, la versión inglesa muestra el texto en español.
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de oferta
+      options:
+        - TFG
+        - TFM
+        - Tesis doctoral
+        - Prácticas externas
+        - Erasmus+ / estancia
+        - Contrato
+        - Otro
+    validations:
+      required: true
+  - type: input
+    id: titulo
+    attributes:
+      label: Título
+      description: Corto y concreto (máx. ~120 caracteres).
+      placeholder: "Uso del espacio de la ganga ortega en paisajes agrarios"
+    validations:
+      required: true
+  - type: input
+    id: titulo_en
+    attributes:
+      label: Título en inglés
+      placeholder: "Space use of black-bellied sandgrouse in farmland"
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción
+      description: Qué se va a hacer y qué aprenderá la persona (3-6 líneas).
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion_en
+    attributes:
+      label: Descripción en inglés
+  - type: textarea
+    id: requisitos
+    attributes:
+      label: Requisitos o perfil
+      description: Opcional. Por ejemplo, carné de conducir, conocimientos de R, disponibilidad en primavera…
+  - type: dropdown
+    id: linea
+    attributes:
+      label: Línea de investigación
+      options:
+        - Ecología de vertebrados terrestres
+        - Ecología agraria
+        - Pastizales y matorrales mediterráneos
+        - Evaluación y restauración ambiental
+        - Biogeografía, macroecología y paleoecología
+        - Varias / otra
+    validations:
+      required: true
+  - type: input
+    id: dirige
+    attributes:
+      label: Dirige o tutoriza
+      description: Nombre y apellido de cada persona, separados por comas.
+      placeholder: "Juan Traba, Adrián Barrero"
+    validations:
+      required: true
+  - type: input
+    id: contacto
+    attributes:
+      label: Correo de contacto
+      placeholder: "nombre.apellido@uam.es"
+    validations:
+      required: true
+  - type: input
+    id: plazo
+    attributes:
+      label: Fecha límite para solicitarla
+      description: Formato AAAA-MM-DD. La oferta se oculta sola al día siguiente. Déjalo vacío si no hay plazo.
+      placeholder: "2027-03-31"
+  - type: input
+    id: inicio
+    attributes:
+      label: Inicio previsto
+      placeholder: "septiembre 2027"
+  - type: input
+    id: duracion
+    attributes:
+      label: Duración
+      placeholder: "1 curso académico"
+  - type: dropdown
+    id: remunerada
+    attributes:
+      label: ¿Es remunerada?
+      options:
+        - "No"
+        - "Sí"
+        - Depende de la convocatoria
+  - type: input
+    id: enlace
+    attributes:
+      label: Enlace a la convocatoria o a más información
+      placeholder: "https://…"
