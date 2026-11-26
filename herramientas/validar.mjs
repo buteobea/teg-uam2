@@ -89,6 +89,10 @@ if (!errores.length) {
     if (local(n.img) && !existe(n.img)) err(n.img, `Noticia «${n.t}»: no existe la imagen «${n.img}».`);
     if (txt(n.t) && !txt(n.t_en)) warn(n.t, `Noticia «${n.t.slice(0, 50)}»: falta "t_en" (título en inglés).`); });
   for (const k of ['PREMIOS', 'ACTIVIDADES', 'OFERTAS']) (W[k] || []).forEach((x, i) => { if (obj(x, k) && !txt(x.t)) err(k, `${k} nº ${i + 1}: falta "t".`); });
+  (W.OFERTAS || []).forEach(o => { if (!o || typeof o !== 'object') return; const ls = [...String(o.lineas || '').split(/\s+/), o.linea].filter(Boolean);
+    for (const id of ls) if (!L.has(id)) err(o.t, `Oferta «${(o.t || '').slice(0, 50)}»: la línea «${id}» no existe. Usa: ${[...L].join(', ')}.`);
+    if (String(o.lineas || '').split(/\s+/).filter(Boolean).length > 2) err(o.t, `Oferta «${(o.t || '').slice(0, 50)}»: como máximo dos líneas.`);
+    if (o.plazo && !/^\d{4}-\d{2}-\d{2}$/.test(o.plazo)) err(o.t, `Oferta «${(o.t || '').slice(0, 50)}»: "plazo" debe tener el formato AAAA-MM-DD.`); });
 
   (W.FINANCIADORES || []).forEach((f, i) => { if (!obj(f, 'FINANCIADORES')) return; if (!txt(f.n)) err('FINANCIADORES', `FINANCIADORES nº ${i + 1}: falta "n".`);
     if (f.buscar) { try { new RegExp(f.buscar); } catch (e) { err(f.n, `${f.n}: "buscar" no es válido.`); } }

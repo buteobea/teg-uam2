@@ -713,7 +713,7 @@ window.NOVEDADES = [
    la oferta se añade aquí sola (campo issue) y se retira al cerrar la issue.
    También se puede añadir a mano, con estos campos:
    tipo (TFG | TFM | Tesis doctoral | Prácticas externas | Erasmus+ / estancia | Contrato | Otro) · t (título) · txt (descripción)
-   t_en · txt_en · requisitos · linea (id) · dirige (nombres separados por comas) · contacto (correo)
+   t_en · txt_en · requisitos · lineas (uno o dos ids separados por espacio, p. ej. "vertebrados agraria") · dirige (nombres separados por comas) · contacto (correo)
    plazo (AAAA-MM-DD; la oferta se oculta sola al día siguiente) · inicio · duracion · remunerada (Sí | No | Depende de la convocatoria) · enlace
    Vacía = se muestra un mensaje genérico. */
 window.OFERTAS = [

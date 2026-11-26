@@ -57,6 +57,8 @@ body:
     id: linea
     attributes:
       label: Línea de investigación
+      description: Elige una o dos (máximo dos).
+      multiple: true
       options:
         - Ecología de vertebrados terrestres
         - Ecología agraria

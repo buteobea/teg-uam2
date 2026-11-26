@@ -28,7 +28,10 @@ export function construir(f, lineas, numero, url) {
   if (!o.contacto || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.contacto)) errores.push('el correo de contacto no es válido');
   if (o.plazo) { if (!/^\d{4}-\d{2}-\d{2}$/.test(o.plazo) || isNaN(Date.parse(o.plazo))) errores.push(`la fecha límite «${o.plazo}» debe tener el formato AAAA-MM-DD (p. ej. 2027-03-31)`); }
   if (o.enlace && !/^https?:\/\//.test(o.enlace)) errores.push('el enlace debe empezar por https://');
-  const l = lineas.find(x => x.nombre === o.linea); if (l) o.linea = l.id; else delete o.linea;
+  // una o dos líneas (los nombres pueden llevar comas, así que se buscan enteros en el texto)
+  const elegidas = lineas.filter(x => String(o.linea || '').includes(x.nombre)).map(x => x.id);
+  if (elegidas.length > 2) errores.push('has elegido más de dos líneas de investigación (máximo dos)');
+  delete o.linea; if (elegidas.length) o.lineas = elegidas.slice(0, 2).join(' ');
   o.t = o.t.replace(/^\[Oferta\]\s*/i, '');
   if (url) o.url = url;
   return { o, errores };
