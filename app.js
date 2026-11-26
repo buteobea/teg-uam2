@@ -340,11 +340,12 @@ galeria() {
     $('#gchips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; f = b.dataset.l; $$('#gchips .chip').forEach(x => x.setAttribute('aria-pressed', x === b)); draw(); }); }
   let list = [];
   const cap = x => [tr(x, 'pie'), x.lugar, x.fecha].filter(Boolean).map(esc).join(' · ');
+  const src = x => x.fuente ? ` · <a href="${esc(x.fuente)}">${EN ? 'source' : 'fuente'} ↗</a>` : '';
   const draw = () => { list = GAL.filter(x => !f || x.linea === f);
-    g.innerHTML = list.map((x, i) => `<figure><button class="gimg" data-i="${i}" aria-label="${esc(tr(x, 'pie') || S.photoBy)}"><img src="${esc(asset(x.img))}" alt="${esc(tr(x, 'pie') || '')}" loading="lazy"></button><figcaption>${cap(x)}<small>© ${esc(x.autor || 'TEG-UAM')}</small></figcaption></figure>`).join(''); };
+    g.innerHTML = list.map((x, i) => `<figure><button class="gimg" data-i="${i}" aria-label="${esc(tr(x, 'pie') || S.photoBy)}"><img src="${esc(asset(x.img))}" alt="${esc(tr(x, 'pie') || '')}" loading="lazy"></button><figcaption>${cap(x)}<small>© ${esc(x.autor || 'TEG-UAM')}${src(x)}</small></figcaption></figure>`).join(''); };
   draw();
   const dlg = $('#lightbox'); let cur = 0, opener = null;
-  const show = i => { cur = (i + list.length) % list.length; const x = list[cur]; $('#lbimg').src = asset(x.img); $('#lbimg').alt = tr(x, 'pie') || ''; $('#lbcap').innerHTML = `${cap(x)} <small>© ${esc(x.autor || 'TEG-UAM')} · ${cur + 1}/${list.length}</small>`; };
+  const show = i => { cur = (i + list.length) % list.length; const x = list[cur]; $('#lbimg').src = asset(x.img); $('#lbimg').alt = tr(x, 'pie') || ''; $('#lbcap').innerHTML = `${cap(x)} <small>© ${esc(x.autor || 'TEG-UAM')}${src(x)} · ${cur + 1}/${list.length}</small>`; };
   g.addEventListener('click', e => { const b = e.target.closest('.gimg'); if (!b) return; opener = b; show(+b.dataset.i); dlg.showModal(); $('#lbclose').focus(); });
   $('#lbprev').onclick = () => show(cur - 1); $('#lbnext').onclick = () => show(cur + 1); $('#lbclose').onclick = () => dlg.close();
   dlg.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(cur - 1); if (e.key === 'ArrowRight') show(cur + 1); });

@@ -102,7 +102,7 @@ if (!errores.length) {
   (W.GALERIA || []).forEach((g, i) => { if (!obj(g, 'GALERIA')) return; const r = g.img || 'GALERIA';
     if (!txt(g.img)) err(r, `GALERIA nº ${i + 1}: falta "img".`); else if (local(g.img) && !existe(g.img)) err(r, `Galería: no existe la foto «${g.img}». Súbela a img/galeria/ o corrige el nombre.`);
     if (!txt(g.autor)) err(r, `Galería «${g.img}»: falta "autor" (hay que indicar quién hizo la foto).`);
-    if (g.linea && !L.has(g.linea)) err(r, `Galería «${g.img}»: la línea «${g.linea}» no existe.`); });
+    if (g.linea && !L.has(g.linea)) err(r, `Galería «${g.img}»: la línea «${g.linea}» no existe.`); url(g, 'fuente', r); });
 
   if (W.CONFIG && W.CONFIG.goatcounter && !/^[a-z0-9-]+$/.test(W.CONFIG.goatcounter)) err('goatcounter', `CONFIG.goatcounter debe ser solo el código de la cuenta (p. ej. "teguam"), sin https:// ni .goatcounter.com.`);
 }
