@@ -370,3 +370,4 @@ h2.h3{font-size:19px;line-height:1.25;font-weight:650;font-stretch:106%}
 .offbar{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:22px 26px;border:1.5px solid var(--leaf);border-radius:10px;background:var(--card)}
 .offbar b{display:block;font-size:22px}.offbar span{color:var(--mute)}.offbar .btn{margin:0}
 .otxt p{margin:0 0 8px}.otxt ul,.otxt ol,.offer dd ul,.offer dd ol{margin:4px 0 8px;padding-left:20px}.otxt li,.offer dd li{margin:2px 0}.offer dd p{margin:0 0 4px}
+.cols3 h3 a{color:inherit;text-decoration-color:var(--leaf);text-underline-offset:3px}
